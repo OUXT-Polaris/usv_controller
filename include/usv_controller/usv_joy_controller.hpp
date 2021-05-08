@@ -44,6 +44,7 @@ public:
       node->declare_parameter<std::string>("right_azimuth_joint", "right_azimuth_joint");
       node->declare_parameter<std::string>("left_thruster_joint", "left_thruster_joint");
       node->declare_parameter<std::string>("right_thruster_joint", "right_thruster_joint");
+      node->declare_parameter<std::string>("joy_topic", "/joy");
     } catch (const std::exception & e) {
       fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
       return controller_interface::return_type::ERROR;
@@ -76,6 +77,7 @@ public:
     node->get_parameter("right_azimuth_joint", right_azimuth_joint_);
     node->get_parameter("left_thruster_joint", left_thruster_joint_);
     node->get_parameter("right_thruster_joint", right_thruster_joint_);
+    node->get_parameter("joy_topic", joy_topic_);
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
@@ -98,7 +100,8 @@ public:
 
 protected:
   realtime_tools::RealtimeBuffer<std::shared_ptr<sensor_msgs::msg::Joy>> rt_command_ptr_;
-  typename rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr sub_;
+  std::string joy_topic_;
   std::string left_azimuth_joint_;
   std::string right_azimuth_joint_;
   std::string left_thruster_joint_;

@@ -38,7 +38,7 @@ class UsvJoyController : public controller_interface::ControllerInterface
 {
 public:
   UsvJoyController()
-  : rt_command_ptr_(nullptr)//, command_subscriber_(nullptr)
+  : rt_command_ptr_(nullptr), sub_(nullptr)
   {}
   controller_interface::return_type init(const std::string & controller_name) override
   {
