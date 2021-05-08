@@ -30,11 +30,83 @@ namespace usv_controller
 class UsvJoyController : public usv_controller::UsvControllerBase<sensor_msgs::msg::Joy>
 {
 public:
-  USV_CONTROLLER_PUBLIC
-  UsvJoyController();
+  UsvJoyController()
+  : rt_command_ptr_(nullptr)//, command_subscriber_(nullptr)
+  {}
+  controller_interface::return_type init(const std::string & controller_name) override
+  {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
+    auto ret = ControllerInterface::init(controller_name);
+    if (ret != controller_interface::return_type::OK) {
+      return ret;
+    }
+    try {
+      auto node = get_node();
+      node->declare_parameter<std::string>("left_azimuth_joint", "left_azimuth_joint");
+      node->declare_parameter<std::string>("right_azimuth_joint", "right_azimuth_joint");
+      node->declare_parameter<std::string>("left_thruster_joint", "left_thruster_joint");
+      node->declare_parameter<std::string>("right_thruster_joint", "right_thruster_joint");
+    } catch (const std::exception & e) {
+      fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
+      return controller_interface::return_type::ERROR;
+    }
+    return controller_interface::return_type::OK;
+  }
 
-  USV_CONTROLLER_PUBLIC
-  controller_interface::return_type update() override;
+  controller_interface::InterfaceConfiguration command_interface_configuration() const override
+  {
+    controller_interface::InterfaceConfiguration command_interfaces_config;
+    command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
+    command_interfaces_config.names.push_back(left_azimuth_joint_ + "/position");
+    command_interfaces_config.names.push_back(right_azimuth_joint_ + "/position");
+    command_interfaces_config.names.push_back(left_thruster_joint_ + "/velocity");
+    command_interfaces_config.names.push_back(right_thruster_joint_ + "/velocity");
+    return command_interfaces_config;
+  }
+
+  controller_interface::InterfaceConfiguration state_interface_configuration() const override
+  {
+    return controller_interface::InterfaceConfiguration{
+      controller_interface::interface_configuration_type::NONE};
+  }
+
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(
+    const rclcpp_lifecycle::State & /*previous_state*/) override
+  {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
+    auto node = get_node();
+    node->get_parameter("left_azimuth_joint", left_azimuth_joint_);
+    node->get_parameter("right_azimuth_joint", right_azimuth_joint_);
+    node->get_parameter("left_thruster_joint", left_thruster_joint_);
+    node->get_parameter("right_thruster_joint", right_thruster_joint_);
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+  }
+
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(
+    const rclcpp_lifecycle::State & /*previous_state*/) override
+  {
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+  }
+
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(
+    const rclcpp_lifecycle::State & /*previous_state*/) override
+  {
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+  }
+
+  controller_interface::return_type update() override
+  {
+    return controller_interface::return_type::OK;
+  }
+
+protected:
+  realtime_tools::RealtimeBuffer<std::shared_ptr<sensor_msgs::msg::Joy>> rt_command_ptr_;
+  typename rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr sub_;
+  std::string left_azimuth_joint_;
+  std::string right_azimuth_joint_;
+  std::string left_thruster_joint_;
+  std::string right_thruster_joint_;
+  std::string logger_name_;
 };
 
 }  // namespace usv_controller

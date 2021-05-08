@@ -31,7 +31,6 @@ template<typename T>
 class UsvControllerBase : public controller_interface::ControllerInterface
 {
 public:
-  USV_CONTROLLER_PUBLIC
   UsvControllerBase()
   : rt_command_ptr_(nullptr)//, command_subscriber_(nullptr)
   {}
@@ -55,7 +54,6 @@ public:
     return controller_interface::return_type::OK;
   }
 
-  USV_CONTROLLER_PUBLIC
   controller_interface::InterfaceConfiguration command_interface_configuration() const override
   {
     controller_interface::InterfaceConfiguration command_interfaces_config;
@@ -67,14 +65,12 @@ public:
     return command_interfaces_config;
   }
 
-  USV_CONTROLLER_PUBLIC
   controller_interface::InterfaceConfiguration state_interface_configuration() const override
   {
     return controller_interface::InterfaceConfiguration{
       controller_interface::interface_configuration_type::NONE};
   }
 
-  USV_CONTROLLER_PUBLIC
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(
     const rclcpp_lifecycle::State & /*previous_state*/) override
   {
@@ -87,21 +83,18 @@ public:
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
-  USV_CONTROLLER_PUBLIC
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(
     const rclcpp_lifecycle::State & /*previous_state*/) override
   {
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
-  USV_CONTROLLER_PUBLIC
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(
     const rclcpp_lifecycle::State & /*previous_state*/) override
   {
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
-  USV_CONTROLLER_PUBLIC
   controller_interface::return_type update() override
   {
     return controller_interface::return_type::OK;
@@ -116,6 +109,6 @@ protected:
   std::string right_thruster_joint_;
   std::string logger_name_;
 };
-} // namespace usv_controller
+} // namespace usv_consensor_msgs::msg::Joyroller
 
 #endif  // USV_CONTROLLER__USV_CONTROLLER_BASE_HPP_

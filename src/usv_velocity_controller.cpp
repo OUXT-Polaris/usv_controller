@@ -19,14 +19,12 @@
 namespace usv_controller
 {
 using hardware_interface::LoanedCommandInterface;
-
-UsvVelocityController::UsvVelocityController()
-: usv_controller::UsvControllerBase<geometry_msgs::msg::Twist>()
-{}
 }  // namespace usv_controller
 
 #include "pluginlib/class_list_macros.hpp"
 
+/*
 PLUGINLIB_EXPORT_CLASS(
   usv_controller::UsvVelocityController,
   controller_interface::ControllerInterface)
+*/

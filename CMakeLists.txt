@@ -27,7 +27,7 @@ find_package(hardware_interface REQUIRED)
 find_package(controller_interface REQUIRED)
 
 add_library(usv_controller SHARED
-  src/usv_velocity_controller.cpp
+  #src/usv_velocity_controller.cpp
   src/usv_joy_controller.cpp
 )
 target_include_directories(
@@ -50,7 +50,7 @@ ament_target_dependencies(
 target_compile_definitions(usv_controller PRIVATE "USV_CONTROLLER_BUILDING_DLL")
 # prevent pluginlib from using boost
 target_compile_definitions(usv_controller PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
-pluginlib_export_plugin_description_file(usv_controller usv_controller.xml)
+pluginlib_export_plugin_description_file(controller_interface usv_controller.xml)
 
 install(
   TARGETS usv_controller

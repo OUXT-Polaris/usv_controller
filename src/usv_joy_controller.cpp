@@ -19,10 +19,6 @@
 namespace usv_controller
 {
 using hardware_interface::LoanedCommandInterface;
-
-UsvJoyController::UsvJoyController()
-: usv_controller::UsvControllerBase<sensor_msgs::msg::Joy>()
-{}
 }  // namespace usv_controller
 
 #include "pluginlib/class_list_macros.hpp"
