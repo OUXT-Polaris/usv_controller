@@ -1,0 +1,9 @@
+<library path="miniv_control">
+    <class name="miniv_control/MiniVHardware"
+           type="miniv_control::MiniVHardware"
+           base_class_type="hardware_interface::SystemInterface">
+      <description>
+        A usv velocity controller plugin for the ros2_control.
+      </description>
+    </class>
+  </library>
