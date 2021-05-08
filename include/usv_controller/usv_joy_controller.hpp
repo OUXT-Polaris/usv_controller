@@ -70,22 +70,7 @@ public:
   }
 
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(
-    const rclcpp_lifecycle::State & /*previous_state*/) override
-  {
-    auto node = get_node();
-    node->get_parameter("left_azimuth_joint", left_azimuth_joint_);
-    node->get_parameter("right_azimuth_joint", right_azimuth_joint_);
-    node->get_parameter("left_thruster_joint", left_thruster_joint_);
-    node->get_parameter("right_thruster_joint", right_thruster_joint_);
-    node->get_parameter("joy_topic", joy_topic_);
-    node->create_subscription<sensor_msgs::msg::Joy>(
-      joy_topic_, rclcpp::SystemDefaultsQoS(),
-      [this](const sensor_msgs::msg::Joy::SharedPtr msg)
-      {
-        rt_command_ptr_.writeFromNonRT(msg);
-      });
-    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-  }
+    const rclcpp_lifecycle::State & /*previous_state*/) override;
 
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(
     const rclcpp_lifecycle::State & /*previous_state*/) override

@@ -34,10 +34,10 @@
 
 namespace usv_controller
 {
-class UsvJoyController : public controller_interface::ControllerInterface
+class UsvVelocityController : public controller_interface::ControllerInterface
 {
 public:
-  UsvJoyController()
+  UsvVelocityController()
   : rt_command_ptr_(nullptr), sub_(nullptr)
   {}
   controller_interface::return_type init(const std::string & controller_name) override

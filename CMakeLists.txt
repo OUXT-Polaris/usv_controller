@@ -27,7 +27,7 @@ find_package(hardware_interface REQUIRED)
 find_package(controller_interface REQUIRED)
 
 add_library(usv_controller SHARED
-  #src/usv_velocity_controller.cpp
+  src/usv_velocity_controller.cpp
   src/usv_joy_controller.cpp
 )
 target_include_directories(
@@ -37,12 +37,16 @@ target_include_directories(
 )
 ament_target_dependencies(
   usv_controller
+  builtin_interfaces
   pluginlib
+  rcutils
   rclcpp
   rclcpp_lifecycle
   controller_interface
   hardware_interface
   realtime_tools
+  sensor_msgs
+  geometry_msgs
 )
 
 # Causes the visibility macros to use dllexport rather than dllimport,
@@ -63,12 +67,16 @@ if(BUILD_TESTING)
 endif()
 
 ament_export_dependencies(
+  builtin_interfaces
   pluginlib
+  rcutils
   rclcpp
   rclcpp_lifecycle
   controller_interface
   hardware_interface
   realtime_tools
+  sensor_msgs
+  geometry_msgs
 )
 ament_export_include_directories(
   include
