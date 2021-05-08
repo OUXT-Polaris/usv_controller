@@ -78,8 +78,8 @@ controller_interface::return_type UsvJoyController::update()
 {
   auto joy = rt_command_ptr_.readFromRT();
   if (joy && joy->get()) {
-    float left_azimuth = joy->get()->axes[0];
-    float right_azimuth = joy->get()->axes[2] * -1;
+    float left_azimuth = joy->get()->axes[0] * M_PI * 0.5;
+    float right_azimuth = joy->get()->axes[2] * -1 * M_PI * 0.5;
     float left_thrust = joy->get()->axes[1];
     float right_thrust = joy->get()->axes[5];
     command_interfaces_[0].set_value(left_azimuth);
