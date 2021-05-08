@@ -65,13 +65,25 @@ on_configure(
   node->get_parameter("left_thruster_joint", left_thruster_joint_);
   node->get_parameter("right_thruster_joint", right_thruster_joint_);
   node->get_parameter("joy_topic", joy_topic_);
-  node->create_subscription<sensor_msgs::msg::Joy>(
+  sub_ = node->create_subscription<sensor_msgs::msg::Joy>(
     joy_topic_, rclcpp::SystemDefaultsQoS(),
     [this](const sensor_msgs::msg::Joy::SharedPtr msg)
     {
       rt_command_ptr_.writeFromNonRT(msg);
     });
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+controller_interface::return_type UsvJoyController::update()
+{
+  auto joy = rt_command_ptr_.readFromRT();
+  if (joy) {
+    float left_azimuth = joy->get()->axes[0];
+    float left_thrust = joy->get()->axes[1];
+    float right_azimuth = joy->get()->axes[2] * -1;
+    float right_thrust = joy->get()->axes[5];
+  }
+  return controller_interface::return_type::OK;
 }
 }  // namespace usv_controller
 
