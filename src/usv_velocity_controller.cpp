@@ -12,13 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* This header must be included by all rclcpp headers which declare symbols
- * which are defined in the rclcpp library. When not building the rclcpp
- * library, i.e. when using the headers in other package's code, the contents
- * of this header change the visibility of certain symbols which the rclcpp
- * library cannot have, but the consuming code must have inorder to link.
- */
-
 #include <usv_controller/usv_velocity_controller.hpp>
 
 #include <hardware_interface/loaned_command_interface.hpp>
@@ -28,6 +21,12 @@ namespace usv_controller
 using hardware_interface::LoanedCommandInterface;
 
 UsvVelocityController::UsvVelocityController()
-: usv_controller::UsvVelocityControllerBase<geometry_msgs::msg::Twist>()
+: usv_controller::UsvControllerBase<geometry_msgs::msg::Twist>()
 {}
-}  // namespace usv_velocity_controller
+}  // namespace usv_controller
+
+#include "pluginlib/class_list_macros.hpp"
+
+PLUGINLIB_EXPORT_CLASS(
+  usv_controller::UsvVelocityController,
+  controller_interface::ControllerInterface)

@@ -11,3 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+#include <usv_controller/usv_joy_controller.hpp>
+
+#include <hardware_interface/loaned_command_interface.hpp>
+
+namespace usv_controller
+{
+using hardware_interface::LoanedCommandInterface;
+
+UsvJoyController::UsvJoyController()
+: usv_controller::UsvControllerBase<sensor_msgs::msg::Joy>()
+{}
+}  // namespace usv_controller
+
+#include "pluginlib/class_list_macros.hpp"
+
+PLUGINLIB_EXPORT_CLASS(
+  usv_controller::UsvJoyController,
+  controller_interface::ControllerInterface)

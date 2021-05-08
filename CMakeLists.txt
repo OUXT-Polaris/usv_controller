@@ -44,10 +44,28 @@ ament_target_dependencies(
   realtime_tools
 )
 
+add_library(usv_joy_controller SHARED
+  src/usv_joy_controller.cpp
+)
+target_include_directories(
+  usv_joy_controller
+  PRIVATE
+  include
+)
+ament_target_dependencies(
+  usv_joy_controller
+  pluginlib
+  rclcpp
+  rclcpp_lifecycle
+  controller_interface
+  hardware_interface
+  realtime_tools
+)
+
 pluginlib_export_plugin_description_file(usv_controller usv_controller.xml)
 
 install(
-  TARGETS usv_velocity_controller
+  TARGETS usv_velocity_controller usv_joy_controller
   DESTINATION lib
 )
 

@@ -1,11 +1,16 @@
 <library path="usv_controller">
-  <!--
-    <class name="miniv_control/MiniVHardware"
-           type="miniv_control::MiniVHardware"
-           base_class_type="hardware_interface::SystemInterface">
-      <description>
-        A usv velocity controller plugin for the ros2_control.
-      </description>
-    </class>
-  -->
-  </library>
+  <class name="usv_controller/UsvVelocityController" 
+    type="usv_controller::UsvVelocityController" 
+    base_class_type="controller_interface::ControllerInterface">
+    <description>
+      velocity controller for unmanned surface vehicle
+    </description>
+  </class>
+  <class name="usv_controller/UsvJoyController" 
+    type="usv_controller::UsvJoyController" 
+    base_class_type="controller_interface::ControllerInterface">
+    <description>
+      joystick controller for unmanned surface vehicle
+    </description>
+  </class>
+</library>

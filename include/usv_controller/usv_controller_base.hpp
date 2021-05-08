@@ -28,11 +28,11 @@
 namespace usv_controller
 {
 template<typename T>
-class UsvVelocityControllerBase : public controller_interface::ControllerInterface
+class UsvControllerBase : public controller_interface::ControllerInterface
 {
 public:
   USV_CONTROLLER_PUBLIC
-  UsvVelocityControllerBase()
+  UsvControllerBase()
   : rt_command_ptr_(nullptr)//, command_subscriber_(nullptr)
   {}
   controller_interface::return_type init(const std::string & controller_name) override

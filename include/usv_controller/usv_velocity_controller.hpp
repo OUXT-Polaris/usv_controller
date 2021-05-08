@@ -35,7 +35,7 @@
 
 namespace usv_controller
 {
-class UsvVelocityController : public usv_controller::UsvVelocityControllerBase<geometry_msgs::msg::Twist>
+class UsvVelocityController : public usv_controller::UsvControllerBase<geometry_msgs::msg::Twist>
 {
 public:
   USV_CONTROLLER_PUBLIC
@@ -43,13 +43,6 @@ public:
 
   USV_CONTROLLER_PUBLIC
   controller_interface::return_type update() override;
-
-protected:
-  std::string left_azimuth_joint_;
-  std::string right_azimuth_joint_;
-  std::string left_thruster_joint_;
-  std::string right_thruster_joint_;
-  std::string logger_name_;
 };
 
 }  // namespace usv_controller
