@@ -26,34 +26,17 @@ find_package(rclcpp REQUIRED)
 find_package(hardware_interface REQUIRED)
 find_package(controller_interface REQUIRED)
 
-add_library(usv_velocity_controller SHARED
+add_library(usv_controller SHARED
   src/usv_velocity_controller.cpp
-)
-target_include_directories(
-  usv_velocity_controller
-  PRIVATE
-  include
-)
-ament_target_dependencies(
-  usv_velocity_controller
-  pluginlib
-  rclcpp
-  rclcpp_lifecycle
-  controller_interface
-  hardware_interface
-  realtime_tools
-)
-
-add_library(usv_joy_controller SHARED
   src/usv_joy_controller.cpp
 )
 target_include_directories(
-  usv_joy_controller
+  usv_controller
   PRIVATE
   include
 )
 ament_target_dependencies(
-  usv_joy_controller
+  usv_controller
   pluginlib
   rclcpp
   rclcpp_lifecycle
@@ -62,10 +45,15 @@ ament_target_dependencies(
   realtime_tools
 )
 
+# Causes the visibility macros to use dllexport rather than dllimport,
+# which is appropriate when building the dll but not consuming it.
+target_compile_definitions(usv_controller PRIVATE "USV_CONTROLLER_BUILDING_DLL")
+# prevent pluginlib from using boost
+target_compile_definitions(usv_controller PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 pluginlib_export_plugin_description_file(usv_controller usv_controller.xml)
 
 install(
-  TARGETS usv_velocity_controller usv_joy_controller
+  TARGETS usv_controller
   DESTINATION lib
 )
 
@@ -73,5 +61,20 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_dependencies(
+  pluginlib
+  rclcpp
+  rclcpp_lifecycle
+  controller_interface
+  hardware_interface
+  realtime_tools
+)
+ament_export_include_directories(
+  include
+)
+ament_export_libraries(
+  usv_controller
+)
 
 ament_package()
