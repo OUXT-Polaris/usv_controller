@@ -29,39 +29,10 @@ namespace usv_controller
 class UsvJoyController : public controller_interface::ControllerInterface
 {
 public:
-  UsvJoyController()
-  : rt_command_ptr_(nullptr)//, command_subscriber_(nullptr)
-  {}
-  controller_interface::return_type init(const std::string & controller_name) override
-  {
-    auto ret = ControllerInterface::init(controller_name);
-    if (ret != controller_interface::return_type::OK) {
-      return ret;
-    }
-    try {
-      auto node = get_node();
-      node->declare_parameter<std::string>("left_azimuth_joint", "left_azimuth_joint");
-      node->declare_parameter<std::string>("right_azimuth_joint", "right_azimuth_joint");
-      node->declare_parameter<std::string>("left_thruster_joint", "left_thruster_joint");
-      node->declare_parameter<std::string>("right_thruster_joint", "right_thruster_joint");
-      node->declare_parameter<std::string>("joy_topic", "/joy");
-    } catch (const std::exception & e) {
-      fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
-      return controller_interface::return_type::ERROR;
-    }
-    return controller_interface::return_type::OK;
-  }
+  UsvJoyController();
+  controller_interface::return_type init(const std::string & controller_name) override;
 
-  controller_interface::InterfaceConfiguration command_interface_configuration() const override
-  {
-    controller_interface::InterfaceConfiguration command_interfaces_config;
-    command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-    command_interfaces_config.names.push_back(left_azimuth_joint_ + "/position");
-    command_interfaces_config.names.push_back(right_azimuth_joint_ + "/position");
-    command_interfaces_config.names.push_back(left_thruster_joint_ + "/velocity");
-    command_interfaces_config.names.push_back(right_thruster_joint_ + "/velocity");
-    return command_interfaces_config;
-  }
+  controller_interface::InterfaceConfiguration command_interface_configuration() const override;
 
   controller_interface::InterfaceConfiguration state_interface_configuration() const override
   {
