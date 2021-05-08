@@ -16,6 +16,8 @@
 
 #include <hardware_interface/loaned_command_interface.hpp>
 
+#include <string>
+
 namespace usv_controller
 {
 using hardware_interface::LoanedCommandInterface;

@@ -24,6 +24,9 @@
 #include <sensor_msgs/msg/joy.hpp>
 #include <controller_interface/controller_interface.hpp>
 
+#include <memory>
+#include <string>
+
 namespace usv_controller
 {
 class UsvJoyController : public controller_interface::ControllerInterface

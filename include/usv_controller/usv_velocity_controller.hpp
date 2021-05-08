@@ -32,6 +32,9 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include <controller_interface/controller_interface.hpp>
 
+#include <memory>
+#include <string>
+
 namespace usv_controller
 {
 class UsvVelocityController : public controller_interface::ControllerInterface
