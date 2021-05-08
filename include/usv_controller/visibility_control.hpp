@@ -19,38 +19,38 @@
  * library cannot have, but the consuming code must have inorder to link.
  */
 
-#ifndef USV_VELOCITY_CONTROLLER__VISIBILITY_CONTROL_HPP_
-#define USV_VELOCITY_CONTROLLER__VISIBILITY_CONTROL_HPP_
+#ifndef USV_CONTROLLER__VISIBILITY_CONTROL_HPP_
+#define USV_CONTROLLER__VISIBILITY_CONTROL_HPP_
 
 // This logic was borrowed (then namespaced) from the examples on the gcc wiki:
 //     https://gcc.gnu.org/wiki/Visibility
 
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef __GNUC__
-#define USV_VELOCITY_CONTROLLER_EXPORT __attribute__((dllexport))
-#define USV_VELOCITY_CONTROLLER_IMPORT __attribute__((dllimport))
+#define USV_CONTROLLER_EXPORT __attribute__((dllexport))
+#define USV_CONTROLLER_IMPORT __attribute__((dllimport))
 #else
-#define USV_VELOCITY_CONTROLLER_EXPORT __declspec(dllexport)
-#define USV_VELOCITY_CONTROLLER_IMPORT __declspec(dllimport)
+#define USV_CONTROLLER_EXPORT __declspec(dllexport)
+#define USV_CONTROLLER_IMPORT __declspec(dllimport)
 #endif
-#ifdef USV_VELOCITY_CONTROLLER_BUILDING_DLL
-#define USV_VELOCITY_CONTROLLER_PUBLIC USV_VELOCITY_CONTROLLER_EXPORT
+#ifdef USV_CONTROLLER_BUILDING_DLL
+#define USV_CONTROLLER_PUBLIC USV_CONTROLLER_EXPORT
 #else
-#define USV_VELOCITY_CONTROLLER_PUBLIC USV_VELOCITY_CONTROLLER_IMPORT
+#define USV_CONTROLLER_PUBLIC USV_CONTROLLER_IMPORT
 #endif
-#define USV_VELOCITY_CONTROLLER_PUBLIC_TYPE USV_VELOCITY_CONTROLLER_PUBLIC
-#define USV_VELOCITY_CONTROLLER_LOCAL
+#define USV_CONTROLLER_PUBLIC_TYPE USV_CONTROLLER_PUBLIC
+#define USV_CONTROLLER_LOCAL
 #else
-#define USV_VELOCITY_CONTROLLER_EXPORT __attribute__((visibility("default")))
-#define USV_VELOCITY_CONTROLLER_IMPORT
+#define USV_CONTROLLER_EXPORT __attribute__((visibility("default")))
+#define USV_CONTROLLER_IMPORT
 #if __GNUC__ >= 4
-#define USV_VELOCITY_CONTROLLER_PUBLIC __attribute__((visibility("default")))
-#define USV_VELOCITY_CONTROLLER_LOCAL __attribute__((visibility("hidden")))
+#define USV_CONTROLLER_PUBLIC __attribute__((visibility("default")))
+#define USV_CONTROLLER_LOCAL __attribute__((visibility("hidden")))
 #else
-#define USV_VELOCITY_CONTROLLER_PUBLIC
-#define USV_VELOCITY_CONTROLLER_LOCAL
+#define USV_CONTROLLER_PUBLIC
+#define USV_CONTROLLER_LOCAL
 #endif
-#define USV_VELOCITY_CONTROLLER_PUBLIC_TYPE
+#define USV_CONTROLLER_PUBLIC_TYPE
 #endif
 
-#endif  // USV_VELOCITY_CONTROLLER__VISIBILITY_CONTROL_HPP_
+#endif  // USV_CONTROLLER__VISIBILITY_CONTROL_HPP_

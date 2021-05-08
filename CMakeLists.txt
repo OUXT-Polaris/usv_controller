@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(usv_velocity_controller)
+project(usv_controller)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -44,7 +44,7 @@ ament_target_dependencies(
   realtime_tools
 )
 
-pluginlib_export_plugin_description_file(usv_velocity_controller usv_velocity_controller.xml)
+pluginlib_export_plugin_description_file(usv_controller usv_controller.xml)
 
 install(
   TARGETS usv_velocity_controller

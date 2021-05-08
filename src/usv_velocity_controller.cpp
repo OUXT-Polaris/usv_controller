@@ -19,11 +19,11 @@
  * library cannot have, but the consuming code must have inorder to link.
  */
 
-#include <usv_velocity_controller/usv_velocity_controller.hpp>
+#include <usv_controller/usv_velocity_controller.hpp>
 
 #include <hardware_interface/loaned_command_interface.hpp>
 
-namespace usv_velocity_controller
+namespace usv_controller
 {
 using hardware_interface::LoanedCommandInterface;
 

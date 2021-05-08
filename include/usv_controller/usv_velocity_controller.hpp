@@ -19,10 +19,10 @@
  * library cannot have, but the consuming code must have inorder to link.
  */
 
-#ifndef USV_VELOCITY_CONTROLLER__USV_VELOCITY_CONTROLLER_HPP_
-#define USV_VELOCITY_CONTROLLER__USV_VELOCITY_CONTROLLER_HPP_
+#ifndef USV_CONTROLLER__USV_CONTROLLER_HPP_
+#define USV_CONTROLLER__USV_CONTROLLER_HPP_
 
-#include <usv_velocity_controller/visibility_control.hpp>
+#include <usv_controller/visibility_control.hpp>
 
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
 #include <rclcpp_lifecycle/state.hpp>
@@ -32,7 +32,7 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include <controller_interface/controller_interface.hpp>
 
-namespace usv_velocity_controller
+namespace usv_controller
 {
 using CmdType = geometry_msgs::msg::Twist;
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
@@ -40,28 +40,28 @@ using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface
 class UsvVelocityController : public controller_interface::ControllerInterface
 {
 public:
-  USV_VELOCITY_CONTROLLER_PUBLIC
+  USV_CONTROLLER_PUBLIC
   UsvVelocityController();
 
-  USV_VELOCITY_CONTROLLER_PUBLIC
+  USV_CONTROLLER_PUBLIC
   controller_interface::return_type init(const std::string & controller_name) override;
 
-  USV_VELOCITY_CONTROLLER_PUBLIC
+  USV_CONTROLLER_PUBLIC
   controller_interface::InterfaceConfiguration command_interface_configuration() const override;
 
-  USV_VELOCITY_CONTROLLER_PUBLIC
+  USV_CONTROLLER_PUBLIC
   controller_interface::InterfaceConfiguration state_interface_configuration() const override;
 
-  USV_VELOCITY_CONTROLLER_PUBLIC
+  USV_CONTROLLER_PUBLIC
   CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
 
-  USV_VELOCITY_CONTROLLER_PUBLIC
+  USV_CONTROLLER_PUBLIC
   CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state) override;
 
-  USV_VELOCITY_CONTROLLER_PUBLIC
+  USV_CONTROLLER_PUBLIC
   CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
 
-  USV_VELOCITY_CONTROLLER_PUBLIC
+  USV_CONTROLLER_PUBLIC
   controller_interface::return_type update() override;
 
 protected:
@@ -74,6 +74,6 @@ protected:
   std::string logger_name_;
 };
 
-}  // namespace usv_velocity_controller
+}  // namespace usv_controller
 
-#endif  // USV_VELOCITY_CONTROLLER__USV_VELOCITY_CONTROLLER_HPP_
+#endif  // USV_CONTROLLER__USV_CONTROLLER_HPP_
