@@ -15,7 +15,6 @@
 #define USV_CONTROLLER__USV_JOY_CONTROLLER_HPP_
 
 #include <usv_controller/visibility_control.hpp>
-#include <usv_controller/usv_controller_base.hpp>
 
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
 #include <rclcpp_lifecycle/state.hpp>
@@ -27,7 +26,7 @@
 
 namespace usv_controller
 {
-class UsvJoyController : public usv_controller::UsvControllerBase<sensor_msgs::msg::Joy>
+class UsvJoyController : public controller_interface::ControllerInterface
 {
 public:
   UsvJoyController()

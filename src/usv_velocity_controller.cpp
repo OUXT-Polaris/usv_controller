@@ -23,8 +23,6 @@ using hardware_interface::LoanedCommandInterface;
 
 #include "pluginlib/class_list_macros.hpp"
 
-/*
 PLUGINLIB_EXPORT_CLASS(
   usv_controller::UsvVelocityController,
   controller_interface::ControllerInterface)
-*/
