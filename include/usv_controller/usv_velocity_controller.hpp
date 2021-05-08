@@ -42,7 +42,6 @@ public:
   {}
   controller_interface::return_type init(const std::string & controller_name) override
   {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
     auto ret = ControllerInterface::init(controller_name);
     if (ret != controller_interface::return_type::OK) {
       return ret;
@@ -80,7 +79,6 @@ public:
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(
     const rclcpp_lifecycle::State & /*previous_state*/) override
   {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
     auto node = get_node();
     node->get_parameter("left_azimuth_joint", left_azimuth_joint_);
     node->get_parameter("right_azimuth_joint", right_azimuth_joint_);
