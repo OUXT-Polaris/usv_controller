@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <usv_controller/usv_joy_controller.hpp>
-
 #include <hardware_interface/loaned_command_interface.hpp>
-
 #include <string>
+#include <usv_controller/usv_joy_controller.hpp>
 
 namespace usv_controller
 {
 using hardware_interface::LoanedCommandInterface;
 
-UsvJoyController::UsvJoyController()
-: rt_command_ptr_(nullptr), sub_(nullptr) {}
+UsvJoyController::UsvJoyController() : rt_command_ptr_(nullptr), sub_(nullptr) {}
 
 controller_interface::return_type UsvJoyController::init(const std::string & controller_name)
 {
@@ -46,7 +43,7 @@ controller_interface::return_type UsvJoyController::init(const std::string & con
 }
 
 controller_interface::InterfaceConfiguration UsvJoyController::command_interface_configuration()
-const
+  const
 {
   controller_interface::InterfaceConfiguration command_interfaces_config;
   command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
@@ -57,9 +54,8 @@ const
   return command_interfaces_config;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn UsvJoyController::
-on_configure(
-  const rclcpp_lifecycle::State & /*previous_state*/)
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+UsvJoyController::on_configure(const rclcpp_lifecycle::State & /*previous_state*/)
 {
   auto node = get_node();
   node->get_parameter("left_azimuth_joint", left_azimuth_joint_);
@@ -69,10 +65,7 @@ on_configure(
   node->get_parameter("joy_topic", joy_topic_);
   sub_ = node->create_subscription<sensor_msgs::msg::Joy>(
     joy_topic_, rclcpp::SystemDefaultsQoS(),
-    [this](const sensor_msgs::msg::Joy::SharedPtr msg)
-    {
-      rt_command_ptr_.writeFromNonRT(msg);
-    });
+    [this](const sensor_msgs::msg::Joy::SharedPtr msg) { rt_command_ptr_.writeFromNonRT(msg); });
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -95,6 +88,4 @@ controller_interface::return_type UsvJoyController::update()
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(
-  usv_controller::UsvJoyController,
-  controller_interface::ControllerInterface)
+PLUGINLIB_EXPORT_CLASS(usv_controller::UsvJoyController, controller_interface::ControllerInterface)
