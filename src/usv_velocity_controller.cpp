@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <usv_controller/usv_velocity_controller.hpp>
-
 #include <hardware_interface/loaned_command_interface.hpp>
+#include <usv_controller/usv_velocity_controller.hpp>
 
 namespace usv_controller
 {
@@ -24,5 +23,4 @@ using hardware_interface::LoanedCommandInterface;
 #include "pluginlib/class_list_macros.hpp"
 
 PLUGINLIB_EXPORT_CLASS(
-  usv_controller::UsvVelocityController,
-  controller_interface::ControllerInterface)
+  usv_controller::UsvVelocityController, controller_interface::ControllerInterface)

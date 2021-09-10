@@ -14,18 +14,17 @@
 #ifndef USV_CONTROLLER__USV_JOY_CONTROLLER_HPP_
 #define USV_CONTROLLER__USV_JOY_CONTROLLER_HPP_
 
-#include <usv_controller/visibility_control.hpp>
+#include <realtime_tools/realtime_buffer.h>
 
+#include <controller_interface/controller_interface.hpp>
+#include <memory>
+#include <rclcpp/subscription.hpp>
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
 #include <rclcpp_lifecycle/state.hpp>
-#include <rclcpp/subscription.hpp>
-#include <realtime_tools/realtime_buffer.h>
-#include <std_msgs/msg/float64_multi_array.hpp>
 #include <sensor_msgs/msg/joy.hpp>
-#include <controller_interface/controller_interface.hpp>
-
-#include <memory>
+#include <std_msgs/msg/float64_multi_array.hpp>
 #include <string>
+#include <usv_controller/visibility_control.hpp>
 
 namespace usv_controller
 {

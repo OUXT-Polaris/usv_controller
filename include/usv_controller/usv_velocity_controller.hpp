@@ -22,27 +22,24 @@
 #ifndef USV_CONTROLLER__USV_VELOCITY_CONTROLLER_HPP_
 #define USV_CONTROLLER__USV_VELOCITY_CONTROLLER_HPP_
 
-#include <usv_controller/visibility_control.hpp>
+#include <realtime_tools/realtime_buffer.h>
 
+#include <controller_interface/controller_interface.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <memory>
+#include <rclcpp/subscription.hpp>
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
 #include <rclcpp_lifecycle/state.hpp>
-#include <rclcpp/subscription.hpp>
-#include <realtime_tools/realtime_buffer.h>
 #include <std_msgs/msg/float64_multi_array.hpp>
-#include <geometry_msgs/msg/twist.hpp>
-#include <controller_interface/controller_interface.hpp>
-
-#include <memory>
 #include <string>
+#include <usv_controller/visibility_control.hpp>
 
 namespace usv_controller
 {
 class UsvVelocityController : public controller_interface::ControllerInterface
 {
 public:
-  UsvVelocityController()
-  : rt_command_ptr_(nullptr), sub_(nullptr)
-  {}
+  UsvVelocityController() : rt_command_ptr_(nullptr), sub_(nullptr) {}
   controller_interface::return_type init(const std::string & controller_name) override
   {
     auto ret = ControllerInterface::init(controller_name);

@@ -1,4 +1,8 @@
 repositories:
+  ros2_control: 
+    url: https://github.com/ros-controls/ros2_control.git
+    type: git
+    version: 0.8.0
   ouxt_common:
     type: git
     url: https://github.com/OUXT-Polaris/ouxt_common.git
