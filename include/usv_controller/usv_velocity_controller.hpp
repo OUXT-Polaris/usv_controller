@@ -76,6 +76,13 @@ public:
       controller_interface::interface_configuration_type::NONE};
   }
 
+#if GALACTIC
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init()
+  {
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+  }
+#endif
+
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(
     const rclcpp_lifecycle::State & /*previous_state*/) override
   {
