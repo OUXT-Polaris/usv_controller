@@ -106,7 +106,11 @@ public:
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
+#if GALACTIC
+  controller_interface::return_type update(const rclcpp::Time &, const rclcpp::Duration &)
+#else
   controller_interface::return_type update() override
+#endif
   {
     return controller_interface::return_type::OK;
   }
