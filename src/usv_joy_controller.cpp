@@ -69,7 +69,12 @@ UsvJoyController::on_configure(const rclcpp_lifecycle::State & /*previous_state*
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
+#if GALACTIC
+controller_interface::return_type UsvJoyController::update(
+  const rclcpp::Time &, const rclcpp::Duration &)
+#else
 controller_interface::return_type UsvJoyController::update()
+#endif
 {
   auto joy = rt_command_ptr_.readFromRT();
   if (joy && joy->get()) {
