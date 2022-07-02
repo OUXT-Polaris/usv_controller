@@ -76,7 +76,7 @@ public:
       controller_interface::interface_configuration_type::NONE};
   }
 
-#if GALACTIC
+#if defined(GALACTIC) || defined(HUMBLE)
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init()
   {
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
@@ -106,7 +106,7 @@ public:
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
-#if GALACTIC
+#if defined(GALACTIC) || defined(HUMBLE)
   controller_interface::return_type update(const rclcpp::Time &, const rclcpp::Duration &)
 #else
   controller_interface::return_type update() override
