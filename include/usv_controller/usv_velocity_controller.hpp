@@ -40,7 +40,7 @@ class UsvVelocityController : public controller_interface::ControllerInterface
 {
 public:
   UsvVelocityController() : rt_command_ptr_(nullptr), sub_(nullptr) {}
-  controller_interface::return_type init(const std::string & controller_name) override
+  controller_interface::return_type init(const std::string & controller_name)
   {
     auto ret = ControllerInterface::init(controller_name);
     if (ret != controller_interface::return_type::OK) {

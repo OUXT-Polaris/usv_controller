@@ -32,7 +32,7 @@ class UsvJoyController : public controller_interface::ControllerInterface
 {
 public:
   UsvJoyController();
-  controller_interface::return_type init(const std::string & controller_name) override;
+  controller_interface::return_type init(const std::string & controller_name);
 
   controller_interface::InterfaceConfiguration command_interface_configuration() const override;
 
