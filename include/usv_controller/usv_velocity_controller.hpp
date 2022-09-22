@@ -61,7 +61,9 @@ public:
         node->declare_parameter<std::string>("right_thruster_joint", "right_thruster_joint");
       }
     } catch (const std::exception & e) {
-      fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
+      RCLCPP_ERROR(
+        get_node()->get_logger(), "Exception thrown during init stage with message: %s \n",
+        e.what());
       return controller_interface::return_type::ERROR;
     }
     return controller_interface::return_type::OK;
