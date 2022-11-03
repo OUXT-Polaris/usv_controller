@@ -31,6 +31,7 @@
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
 #include <rclcpp_lifecycle/state.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 #include <string>
 #include <usv_controller/visibility_control.hpp>
 
@@ -39,7 +40,7 @@ namespace usv_controller
 class UsvVelocityController : public controller_interface::ControllerInterface
 {
 public:
-  UsvVelocityController() : rt_command_ptr_(nullptr), sub_(nullptr) {}
+  UsvVelocityController() : target_twist_ptr_(nullptr), sub_(nullptr) {}
   controller_interface::return_type init(const std::string & controller_name) override
   {
     auto ret = ControllerInterface::init(controller_name);
@@ -101,6 +102,14 @@ public:
     node->get_parameter("right_azimuth_joint", right_azimuth_joint_);
     node->get_parameter("left_thruster_joint", left_thruster_joint_);
     node->get_parameter("right_thruster_joint", right_thruster_joint_);
+
+    target_twist_sub_ = node->create_subscription<geometry_msgs::msg::Twist>(
+      "target_twist", 1,
+      [&](geometry_msgs::msg::Twist::SharedPtr msg){ target_twist_ptr_.writeFromNonRT(msg); });
+
+    debug_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64MultiArray>("/debug_usv_cmd", 1);
+
+
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
@@ -122,17 +131,47 @@ public:
   controller_interface::return_type update() override
 #endif
   {
+    auto target_twist_ = target_twist_ptr_.readFromRT();
+    if(target_twist_ && target_twist_->get())
+    {
+      std::cout << "usv velocity contoller" << std::endl;
+      double twist_x = target_twist_->get()->linear.x;
+      double twist_y = target_twist_->get()->linear.y;
+      double twist_omega = target_twist_->get()->angular.z;
+
+      float left_azimuth = 0;
+      float right_azimuth = 0;
+      float left_thrust = 0;
+      float right_thrust = 0;
+      command_interfaces_[0].set_value(left_azimuth);
+      command_interfaces_[1].set_value(right_azimuth);
+      command_interfaces_[2].set_value(left_thrust);
+      command_interfaces_[3].set_value(right_thrust);
+
+      std_msgs::msg::Float64MultiArray debug_msg;
+      debug_msg.data.resize(4);
+      debug_msg.data[0] = left_azimuth;
+      debug_msg.data[1] = right_azimuth;
+      debug_msg.data[2] = left_thrust;
+      debug_msg.data[3] = right_thrust;
+      
+      debug_cmd_pub_->publish(debug_msg);
+    }
+
     return controller_interface::return_type::OK;
   }
 
 protected:
-  realtime_tools::RealtimeBuffer<std::shared_ptr<geometry_msgs::msg::Twist>> rt_command_ptr_;
+  // realtime_tools::RealtimeBuffer<std::shared_ptr<geometry_msgs::msg::Twist>> rt_command_ptr_;
   typename rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub_;
   std::string left_azimuth_joint_;
   std::string right_azimuth_joint_;
   std::string left_thruster_joint_;
   std::string right_thruster_joint_;
   std::string logger_name_;
+  realtime_tools::RealtimeBuffer<geometry_msgs::msg::Twist::SharedPtr> target_twist_ptr_;
+  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr target_twist_sub_;
+  rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr debug_cmd_pub_;
 };
 
 }  // namespace usv_controller
