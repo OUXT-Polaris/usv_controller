@@ -32,6 +32,7 @@
 #include <rclcpp_lifecycle/state.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include <control_toolbox/pid.hpp>
 #include <string>
 #include <usv_controller/visibility_control.hpp>
 
@@ -40,7 +41,7 @@ namespace usv_controller
 class UsvVelocityController : public controller_interface::ControllerInterface
 {
 public:
-  UsvVelocityController() : target_twist_ptr_(nullptr), sub_(nullptr) {}
+  UsvVelocityController(){}
   controller_interface::return_type init(const std::string & controller_name) override
   {
     auto ret = ControllerInterface::init(controller_name);
@@ -102,13 +103,35 @@ public:
     node->get_parameter("right_azimuth_joint", right_azimuth_joint_);
     node->get_parameter("left_thruster_joint", left_thruster_joint_);
     node->get_parameter("right_thruster_joint", right_thruster_joint_);
+    node->get_parameter("linear_pid_gain.kp", linear_pid_gain_.p_gain_);
+    node->get_parameter("linear_pid_gain.ki", linear_pid_gain_.i_gain_);
+    node->get_parameter("linear_pid_gain.kd", linear_pid_gain_.d_gain_);
+    node->get_parameter("linear_pid_gain.i_min", linear_pid_gain_.i_min_);
+    node->get_parameter("linear_pid_gain.i_max", linear_pid_gain_.i_max_);
+    node->get_parameter("linear_pid_gain.antiwindup", linear_pid_gain_.antiwindup_);
+    node->get_parameter("anguler_pid_gain.kp", anguler_pid_gain_.p_gain_);
+    node->get_parameter("anguler_pid_gain.ki", anguler_pid_gain_.i_gain_);
+    node->get_parameter("anguler_pid_gain.kd", anguler_pid_gain_.d_gain_);
+    node->get_parameter("anguler_pid_gain.i_min", anguler_pid_gain_.i_min_);
+    node->get_parameter("anguler_pid_gain.i_max", anguler_pid_gain_.i_max_);
+    node->get_parameter("anguler_pid_gain.antiwindup", anguler_pid_gain_.antiwindup_);
+    node->get_parameter("hull_width", hull_width_);
+
+    linear_pid_ = std::make_shared<control_toolbox::Pid>();
+    linear_pid_->setGains(linear_pid_gain_);
+
+    anguler_pid_ = std::make_shared<control_toolbox::Pid>();
+    anguler_pid_->setGains(linear_pid_gain_);
 
     target_twist_sub_ = node->create_subscription<geometry_msgs::msg::Twist>(
       "target_twist", 1,
       [&](geometry_msgs::msg::Twist::SharedPtr msg){ target_twist_ptr_.writeFromNonRT(msg); });
 
-    debug_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64MultiArray>("/debug_usv_cmd", 1);
+    current_twist_sub_ = node->create_subscription<geometry_msgs::msg::Twist>(
+      "current_twist", 1,
+      [&](geometry_msgs::msg::Twist::SharedPtr msg){ current_twist_ptr_.writeFromNonRT(msg); });
 
+    debug_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64MultiArray>("/usv_force_cmd", 1);
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
@@ -126,23 +149,40 @@ public:
   }
 
 #if GALACTIC
-  controller_interface::return_type update(const rclcpp::Time &, const rclcpp::Duration &)
+  controller_interface::return_type update(const rclcpp::Time &time, const rclcpp::Duration &period)
 #else
   controller_interface::return_type update() override
 #endif
   {
-    auto target_twist_ = target_twist_ptr_.readFromRT();
-    if(target_twist_ && target_twist_->get())
+#if GALACTIC
+    (void) time;
+    const uint64_t dt_ns = (uint64_t)period.nanoseconds();
+#else
+    const uint64_t dt_ns = 10UL * 1000 * 1000; // 10ms
+#endif
+    auto target_twist = target_twist_ptr_.readFromRT();
+    auto current_twist = current_twist_ptr_.readFromRT();
+    if(target_twist && target_twist->get() && current_twist && current_twist->get())
     {
-      std::cout << "usv velocity contoller" << std::endl;
-      double twist_x = target_twist_->get()->linear.x;
-      double twist_y = target_twist_->get()->linear.y;
-      double twist_omega = target_twist_->get()->angular.z;
+      double target_twist_x = target_twist->get()->linear.x;
+      double target_twist_omega = target_twist->get()->angular.z;
+      double current_twist_x = current_twist->get()->linear.x;
+      double current_twist_omega = current_twist->get()->angular.z;
 
+      // Calculate force
+      double linear_force = linear_pid_->computeCommand(target_twist_x-current_twist_x, dt_ns);
+      double turning_force = anguler_pid_->computeCommand(target_twist_omega-current_twist_omega, dt_ns);
+
+      // Calculate motor thrust
+      std::array<double, 2> fb_mthrust;
+      fb_mthrust[0] = linear_force+0.5*hull_width_*turning_force;
+      fb_mthrust[1] = linear_force-0.5*hull_width_*turning_force;
+
+      // Calculate motor command
       float left_azimuth = 0;
       float right_azimuth = 0;
-      float left_thrust = 0;
-      float right_thrust = 0;
+      float left_thrust = fb_mthrust[1];
+      float right_thrust = fb_mthrust[0];
       command_interfaces_[0].set_value(left_azimuth);
       command_interfaces_[1].set_value(right_azimuth);
       command_interfaces_[2].set_value(left_thrust);
@@ -162,16 +202,22 @@ public:
   }
 
 protected:
-  // realtime_tools::RealtimeBuffer<std::shared_ptr<geometry_msgs::msg::Twist>> rt_command_ptr_;
-  typename rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub_;
   std::string left_azimuth_joint_;
   std::string right_azimuth_joint_;
   std::string left_thruster_joint_;
   std::string right_thruster_joint_;
   std::string logger_name_;
-  realtime_tools::RealtimeBuffer<geometry_msgs::msg::Twist::SharedPtr> target_twist_ptr_;
+  realtime_tools::RealtimeBuffer<geometry_msgs::msg::Twist::SharedPtr> target_twist_ptr_{nullptr};
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr target_twist_sub_;
+  realtime_tools::RealtimeBuffer<geometry_msgs::msg::Twist::SharedPtr> current_twist_ptr_{nullptr};
+  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr current_twist_sub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr debug_cmd_pub_;
+  using PidSharedPtr = std::shared_ptr<control_toolbox::Pid>;
+  control_toolbox::Pid::Gains linear_pid_gain_;
+  PidSharedPtr linear_pid_ = {nullptr};
+  control_toolbox::Pid::Gains anguler_pid_gain_;
+  PidSharedPtr anguler_pid_ = {nullptr};
+  double hull_width_;
 };
 
 }  // namespace usv_controller

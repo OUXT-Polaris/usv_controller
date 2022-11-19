@@ -29,6 +29,7 @@ find_package(rclcpp_lifecycle REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(hardware_interface REQUIRED)
 find_package(controller_interface REQUIRED)
+find_package(control_toolbox REQUIRED)
 
 add_library(usv_controller SHARED
   src/usv_velocity_controller.cpp
@@ -47,6 +48,7 @@ ament_target_dependencies(
   rclcpp
   rclcpp_lifecycle
   controller_interface
+  control_toolbox
   hardware_interface
   realtime_tools
   sensor_msgs
