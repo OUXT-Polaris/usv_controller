@@ -24,6 +24,7 @@
 
 #include <realtime_tools/realtime_buffer.h>
 
+#include <control_toolbox/pid.hpp>
 #include <controller_interface/controller_interface.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <memory>
@@ -31,8 +32,6 @@
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
 #include <rclcpp_lifecycle/state.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
-#include <geometry_msgs/msg/twist.hpp>
-#include <control_toolbox/pid.hpp>
 #include <string>
 #include <usv_controller/visibility_control.hpp>
 
@@ -41,7 +40,7 @@ namespace usv_controller
 class UsvVelocityController : public controller_interface::ControllerInterface
 {
 public:
-  UsvVelocityController(){}
+  UsvVelocityController() {}
   controller_interface::return_type init(const std::string & controller_name) override
   {
     auto ret = ControllerInterface::init(controller_name);
@@ -125,11 +124,11 @@ public:
 
     target_twist_sub_ = node->create_subscription<geometry_msgs::msg::Twist>(
       "target_twist", 1,
-      [&](geometry_msgs::msg::Twist::SharedPtr msg){ target_twist_ptr_.writeFromNonRT(msg); });
+      [&](geometry_msgs::msg::Twist::SharedPtr msg) { target_twist_ptr_.writeFromNonRT(msg); });
 
     current_twist_sub_ = node->create_subscription<geometry_msgs::msg::Twist>(
       "current_twist", 1,
-      [&](geometry_msgs::msg::Twist::SharedPtr msg){ current_twist_ptr_.writeFromNonRT(msg); });
+      [&](geometry_msgs::msg::Twist::SharedPtr msg) { current_twist_ptr_.writeFromNonRT(msg); });
 
     debug_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64MultiArray>("/usv_force_cmd", 1);
 
@@ -149,34 +148,35 @@ public:
   }
 
 #if GALACTIC
-  controller_interface::return_type update(const rclcpp::Time &time, const rclcpp::Duration &period)
+  controller_interface::return_type update(
+    const rclcpp::Time & time, const rclcpp::Duration & period)
 #else
   controller_interface::return_type update() override
 #endif
   {
 #if GALACTIC
-    (void) time;
+    (void)time;
     const uint64_t dt_ns = (uint64_t)period.nanoseconds();
 #else
-    const uint64_t dt_ns = 10UL * 1000 * 1000; // 10ms
+    const uint64_t dt_ns = 10UL * 1000 * 1000;  // 10ms
 #endif
     auto target_twist = target_twist_ptr_.readFromRT();
     auto current_twist = current_twist_ptr_.readFromRT();
-    if(target_twist && target_twist->get() && current_twist && current_twist->get())
-    {
+    if (target_twist && target_twist->get() && current_twist && current_twist->get()) {
       double target_twist_x = target_twist->get()->linear.x;
       double target_twist_omega = target_twist->get()->angular.z;
       double current_twist_x = current_twist->get()->linear.x;
       double current_twist_omega = current_twist->get()->angular.z;
 
       // Calculate force
-      double linear_force = linear_pid_->computeCommand(target_twist_x-current_twist_x, dt_ns);
-      double turning_force = anguler_pid_->computeCommand(target_twist_omega-current_twist_omega, dt_ns);
+      double linear_force = linear_pid_->computeCommand(target_twist_x - current_twist_x, dt_ns);
+      double turning_force =
+        anguler_pid_->computeCommand(target_twist_omega - current_twist_omega, dt_ns);
 
       // Calculate motor thrust
       std::array<double, 2> fb_mthrust;
-      fb_mthrust[0] = linear_force+0.5*hull_width_*turning_force;
-      fb_mthrust[1] = linear_force-0.5*hull_width_*turning_force;
+      fb_mthrust[0] = linear_force + 0.5 * hull_width_ * turning_force;
+      fb_mthrust[1] = linear_force - 0.5 * hull_width_ * turning_force;
 
       // Calculate motor command
       float left_azimuth = 0;
@@ -194,7 +194,7 @@ public:
       debug_msg.data[1] = right_azimuth;
       debug_msg.data[2] = left_thrust;
       debug_msg.data[3] = right_thrust;
-      
+
       debug_cmd_pub_->publish(debug_msg);
     }
 
