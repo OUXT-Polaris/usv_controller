@@ -48,12 +48,22 @@ public:
     }
     try {
       auto node = get_node();
-      node->declare_parameter<std::string>("left_azimuth_joint", "left_azimuth_joint");
-      node->declare_parameter<std::string>("right_azimuth_joint", "right_azimuth_joint");
-      node->declare_parameter<std::string>("left_thruster_joint", "left_thruster_joint");
-      node->declare_parameter<std::string>("right_thruster_joint", "right_thruster_joint");
+      if (!node->has_parameter("left_azimuth_joint")) {
+        node->declare_parameter<std::string>("left_azimuth_joint", "left_azimuth_joint");
+      }
+      if (!node->has_parameter("right_azimuth_joint")) {
+        node->declare_parameter<std::string>("right_azimuth_joint", "right_azimuth_joint");
+      }
+      if (!node->has_parameter("left_thruster_joint")) {
+        node->declare_parameter<std::string>("left_thruster_joint", "left_thruster_joint");
+      }
+      if (!node->has_parameter("right_thruster_joint")) {
+        node->declare_parameter<std::string>("right_thruster_joint", "right_thruster_joint");
+      }
     } catch (const std::exception & e) {
-      fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
+      RCLCPP_ERROR(
+        get_node()->get_logger(), "Exception thrown during init stage with message: %s \n",
+        e.what());
       return controller_interface::return_type::ERROR;
     }
     return controller_interface::return_type::OK;
