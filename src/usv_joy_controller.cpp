@@ -77,7 +77,7 @@ UsvJoyController::on_configure(const rclcpp_lifecycle::State & /*previous_state*
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-#if GALACTIC
+#if defined(GALACTIC) || defined(HUMBLE)
 controller_interface::return_type UsvJoyController::update(
   const rclcpp::Time &, const rclcpp::Duration &)
 #else
