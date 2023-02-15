@@ -40,8 +40,8 @@ namespace usv_controller
 class UsvVelocityController : public controller_interface::ControllerInterface
 {
 public:
-  UsvVelocityController() {}
-  controller_interface::return_type init(const std::string & controller_name) override
+  UsvVelocityController() : rt_command_ptr_(nullptr), sub_(nullptr) {}
+  controller_interface::return_type init(const std::string & controller_name)
   {
     auto ret = ControllerInterface::init(controller_name);
     if (ret != controller_interface::return_type::OK) {
@@ -87,7 +87,7 @@ public:
       controller_interface::interface_configuration_type::NONE};
   }
 
-#if GALACTIC
+#if defined(GALACTIC) || defined(HUMBLE)
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init()
   {
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
@@ -147,9 +147,8 @@ public:
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
-#if GALACTIC
-  controller_interface::return_type update(
-    const rclcpp::Time & time, const rclcpp::Duration & period)
+#if defined(GALACTIC) || defined(HUMBLE)
+  controller_interface::return_type update(const rclcpp::Time &, const rclcpp::Duration &)
 #else
   controller_interface::return_type update() override
 #endif
