@@ -32,6 +32,7 @@
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
 #include <rclcpp_lifecycle/state.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
+#include <std_msgs/msg/float64.hpp>
 #include <string>
 #include <usv_controller/visibility_control.hpp>
 
@@ -84,6 +85,10 @@ protected:
   realtime_tools::RealtimeBuffer<geometry_msgs::msg::Twist::SharedPtr> current_twist_ptr_{nullptr};
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr current_twist_sub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr debug_cmd_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr thruster_left_cmd_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr thruster_left_agl_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr thruster_right_cmd_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr thruster_right_agl_pub_;
   using PidSharedPtr = std::shared_ptr<control_toolbox::Pid>;
   control_toolbox::Pid::Gains linear_pid_gain_;
   PidSharedPtr linear_pid_ = {nullptr};
