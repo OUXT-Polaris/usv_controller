@@ -184,7 +184,6 @@ controller_interface::return_type UsvVelocityController::update() override
     wamv_left_agl.data = left_azimuth;
     wamv_right_agl.data = right_azimuth;
 
-    float d = std::sqrt(wamv_left_thrust.data*wamv_left_thrust.data+wamv_right_thrust.data*wamv_right_thrust.data)
     wamv_left_thrust.data = 100000*left_thrust;
     wamv_right_thrust.data = 100000*right_thrust;
     if (wamv_left_thrust.data<500 && 10 < wamv_left_thrust.data)
