@@ -67,7 +67,7 @@ UsvVelocityController::command_interface_configuration() const
 }
 
 controller_interface::InterfaceConfiguration UsvVelocityController::state_interface_configuration()
-  const
+const
 {
   return controller_interface::InterfaceConfiguration{
     controller_interface::interface_configuration_type::NONE};
@@ -111,18 +111,22 @@ UsvVelocityController::on_configure(const rclcpp_lifecycle::State & /*previous_s
 
   target_twist_sub_ = node->create_subscription<geometry_msgs::msg::Twist>(
     "target_twist", 1,
-    [&](geometry_msgs::msg::Twist::SharedPtr msg) { target_twist_ptr_.writeFromNonRT(msg); });
+    [&](geometry_msgs::msg::Twist::SharedPtr msg) {target_twist_ptr_.writeFromNonRT(msg);});
 
   current_twist_sub_ = node->create_subscription<geometry_msgs::msg::Twist>(
     "current_twist", 1,
-    [&](geometry_msgs::msg::Twist::SharedPtr msg) { current_twist_ptr_.writeFromNonRT(msg); });
+    [&](geometry_msgs::msg::Twist::SharedPtr msg) {current_twist_ptr_.writeFromNonRT(msg);});
 
   debug_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64MultiArray>("/usv_force_cmd", 1);
 
-  thruster_left_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64>("/wamv/thrusters/left/thrust", 1);
-  thruster_left_agl_pub_ = node->create_publisher<std_msgs::msg::Float64>("/wamv/thrusters/left/pos", 1);
-  thruster_right_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64>("/wamv/thrusters/right/thrust", 1);
-  thruster_right_agl_pub_ = node->create_publisher<std_msgs::msg::Float64>("/wamv/thrusters/right/pos", 1);
+  thruster_left_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64>(
+    "/wamv/thrusters/left/thrust", 1);
+  thruster_left_agl_pub_ = node->create_publisher<std_msgs::msg::Float64>(
+    "/wamv/thrusters/left/pos", 1);
+  thruster_right_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64>(
+    "/wamv/thrusters/right/thrust", 1);
+  thruster_right_agl_pub_ = node->create_publisher<std_msgs::msg::Float64>(
+    "/wamv/thrusters/right/pos", 1);
 
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -174,47 +178,49 @@ controller_interface::return_type UsvVelocityController::update() override
     debug_msg.data[1] = right_azimuth;
     debug_msg.data[2] = left_thrust;
     debug_msg.data[3] = right_thrust;
-    
+
 
     debug_cmd_pub_->publish(debug_msg);
 
-    // gazebo 
-    
+    // gazebo
+
     std_msgs::msg::Float64 wamv_left_agl, wamv_right_agl, wamv_left_thrust, wamv_right_thrust;
     wamv_left_agl.data = left_azimuth;
     wamv_right_agl.data = right_azimuth;
 
-    wamv_left_thrust.data = 100000*left_thrust;
-    wamv_right_thrust.data = 100000*right_thrust;
-    if (wamv_left_thrust.data<500 && 10 < wamv_left_thrust.data)
+    wamv_left_thrust.data = 100000 * left_thrust;
+    wamv_right_thrust.data = 100000 * right_thrust;
+    if (wamv_left_thrust.data < 500 && 10 < wamv_left_thrust.data) {
       wamv_left_thrust.data = 500;
-    else if (-500 < wamv_left_thrust.data && wamv_left_thrust.data < 10)
+    } else if (-500 < wamv_left_thrust.data && wamv_left_thrust.data < 10) {
       wamv_left_thrust.data = -500;
-    else if (wamv_left_thrust.data < -2000)
-      wamv_left_thrust.data = -20000;
-    else if (2000 < wamv_left_thrust.data )
-      wamv_left_thrust.data = 20000;
+    } else if (wamv_left_thrust.data < -2000) {
+      wamv_left_thrust.data = -2000;
+    } else if (2000 < wamv_left_thrust.data) {
+      wamv_left_thrust.data = 2000;
+    }
 
-    
-    if (wamv_right_thrust.data<500 && 10 < wamv_right_thrust.data)
+
+    if (wamv_right_thrust.data < 500 && 10 < wamv_right_thrust.data) {
       wamv_right_thrust.data = 500;
-    else if (-500 < wamv_right_thrust.data && wamv_right_thrust.data < 10)
+    } else if (-500 < wamv_right_thrust.data && wamv_right_thrust.data < 10) {
       wamv_right_thrust.data = -500;
-    else if (wamv_right_thrust.data < -2000)
-      wamv_right_thrust.data = -20000;
-    else if (2000 < wamv_right_thrust.data )
-      wamv_right_thrust.data = 20000;
+    } else if (wamv_right_thrust.data < -2000) {
+      wamv_right_thrust.data = -2000;
+    } else if (2000 < wamv_right_thrust.data) {
+      wamv_right_thrust.data = 2000;
+    }
 
-    
+
     // wamv_left_thrust.data = 1000;
     // wamv_right_thrust.data = 1000;
-    
+
 
     thruster_left_agl_pub_->publish(wamv_left_agl);
     thruster_right_agl_pub_->publish(wamv_right_agl);
     thruster_left_cmd_pub_->publish(wamv_left_thrust);
     thruster_right_cmd_pub_->publish(wamv_right_thrust);
-    
+
   }
 
   return controller_interface::return_type::OK;

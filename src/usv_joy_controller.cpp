@@ -20,7 +20,8 @@ namespace usv_controller
 {
 using hardware_interface::LoanedCommandInterface;
 
-UsvJoyController::UsvJoyController() : rt_command_ptr_(nullptr), sub_(nullptr) {}
+UsvJoyController::UsvJoyController()
+: rt_command_ptr_(nullptr), sub_(nullptr) {}
 
 controller_interface::return_type UsvJoyController::init(const std::string & controller_name)
 {
@@ -51,7 +52,7 @@ controller_interface::return_type UsvJoyController::init(const std::string & con
 }
 
 controller_interface::InterfaceConfiguration UsvJoyController::command_interface_configuration()
-  const
+const
 {
   controller_interface::InterfaceConfiguration command_interfaces_config;
   command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
@@ -73,7 +74,7 @@ UsvJoyController::on_configure(const rclcpp_lifecycle::State & /*previous_state*
   node->get_parameter("joy_topic", joy_topic_);
   sub_ = node->create_subscription<sensor_msgs::msg::Joy>(
     joy_topic_, rclcpp::SystemDefaultsQoS(),
-    [this](const sensor_msgs::msg::Joy::SharedPtr msg) { rt_command_ptr_.writeFromNonRT(msg); });
+    [this](const sensor_msgs::msg::Joy::SharedPtr msg) {rt_command_ptr_.writeFromNonRT(msg);});
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
