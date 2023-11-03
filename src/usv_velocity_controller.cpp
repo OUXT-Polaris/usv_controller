@@ -183,8 +183,30 @@ controller_interface::return_type UsvVelocityController::update() override
     std_msgs::msg::Float64 wamv_left_agl, wamv_right_agl, wamv_left_thrust, wamv_right_thrust;
     wamv_left_agl.data = left_azimuth;
     wamv_right_agl.data = right_azimuth;
-    wamv_left_thrust.data = left_thrust;
-    wamv_right_thrust.data = right_thrust;
+
+    float d = std::sqrt(wamv_left_thrust.data*wamv_left_thrust.data+wamv_right_thrust.data*wamv_right_thrust.data)
+    wamv_left_thrust.data = 100000*left_thrust;
+    wamv_right_thrust.data = 100000*right_thrust;
+    if (wamv_left_thrust.data<500 && 10 < wamv_left_thrust.data)
+      wamv_left_thrust.data = 500;
+    else if (-500 < wamv_left_thrust.data && wamv_left_thrust.data < 10)
+      wamv_left_thrust.data = -500;
+    else if (wamv_left_thrust.data < -2000)
+      wamv_left_thrust.data = -20000;
+    else if (2000 < wamv_left_thrust.data )
+      wamv_left_thrust.data = 20000;
+
+    
+    if (wamv_right_thrust.data<500 && 10 < wamv_right_thrust.data)
+      wamv_right_thrust.data = 500;
+    else if (-500 < wamv_right_thrust.data && wamv_right_thrust.data < 10)
+      wamv_right_thrust.data = -500;
+    else if (wamv_right_thrust.data < -2000)
+      wamv_right_thrust.data = -20000;
+    else if (2000 < wamv_right_thrust.data )
+      wamv_right_thrust.data = 20000;
+
+    
     // wamv_left_thrust.data = 1000;
     // wamv_right_thrust.data = 1000;
     
