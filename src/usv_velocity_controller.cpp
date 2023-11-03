@@ -119,6 +119,15 @@ UsvVelocityController::on_configure(const rclcpp_lifecycle::State & /*previous_s
 
   debug_cmd_pub_ = node->create_publisher<std_msgs::msg::Float64MultiArray>("/usv_force_cmd", 1);
 
+  thruster_left_cmd_pub_ =
+    node->create_publisher<std_msgs::msg::Float64>("/wamv/thrusters/left/thrust", 1);
+  thruster_left_agl_pub_ =
+    node->create_publisher<std_msgs::msg::Float64>("/wamv/thrusters/left/pos", 1);
+  thruster_right_cmd_pub_ =
+    node->create_publisher<std_msgs::msg::Float64>("/wamv/thrusters/right/thrust", 1);
+  thruster_right_agl_pub_ =
+    node->create_publisher<std_msgs::msg::Float64>("/wamv/thrusters/right/pos", 1);
+
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -149,7 +158,7 @@ controller_interface::return_type UsvVelocityController::update() override
       anguler_pid_->computeCommand(target_twist_omega - current_twist_omega, dt_ns);
 
     // Calculate motor thrust
-    std::array<double, 2> fb_mthrust;
+    std::array<float, 2> fb_mthrust;
     fb_mthrust[0] = linear_force + 0.5 * hull_width_ * turning_force;
     fb_mthrust[1] = linear_force - 0.5 * hull_width_ * turning_force;
 
@@ -171,6 +180,42 @@ controller_interface::return_type UsvVelocityController::update() override
     debug_msg.data[3] = right_thrust;
 
     debug_cmd_pub_->publish(debug_msg);
+
+    // gazebo
+
+    std_msgs::msg::Float64 wamv_left_agl, wamv_right_agl, wamv_left_thrust, wamv_right_thrust;
+    wamv_left_agl.data = left_azimuth;
+    wamv_right_agl.data = right_azimuth;
+
+    wamv_left_thrust.data = 100000 * left_thrust;
+    wamv_right_thrust.data = 100000 * right_thrust;
+    if (wamv_left_thrust.data < 500 && 10 < wamv_left_thrust.data) {
+      wamv_left_thrust.data = 500;
+    } else if (-500 < wamv_left_thrust.data && wamv_left_thrust.data < 10) {
+      wamv_left_thrust.data = -500;
+    } else if (wamv_left_thrust.data < -2000) {
+      wamv_left_thrust.data = -2000;
+    } else if (2000 < wamv_left_thrust.data) {
+      wamv_left_thrust.data = 2000;
+    }
+
+    if (wamv_right_thrust.data < 500 && 10 < wamv_right_thrust.data) {
+      wamv_right_thrust.data = 500;
+    } else if (-500 < wamv_right_thrust.data && wamv_right_thrust.data < 10) {
+      wamv_right_thrust.data = -500;
+    } else if (wamv_right_thrust.data < -2000) {
+      wamv_right_thrust.data = -2000;
+    } else if (2000 < wamv_right_thrust.data) {
+      wamv_right_thrust.data = 2000;
+    }
+
+    // wamv_left_thrust.data = 1000;
+    // wamv_right_thrust.data = 1000;
+
+    thruster_left_agl_pub_->publish(wamv_left_agl);
+    thruster_right_agl_pub_->publish(wamv_right_agl);
+    thruster_left_cmd_pub_->publish(wamv_left_thrust);
+    thruster_right_cmd_pub_->publish(wamv_right_thrust);
   }
 
   return controller_interface::return_type::OK;
