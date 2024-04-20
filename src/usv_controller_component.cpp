@@ -12,23 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
-#define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
-
-#include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/joy.hpp>
-#include <std_msgs/msg/string.hpp>
+#include <usv_controller/usv_controller_component.hpp>
 
 namespace usv_controller
 {
-class UsvControllerComponent : public rclcpp::Node
+UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & options)
+: Node("usv_controller", options)
 {
-public:
-  USV_CONTROLLER_PUBLIC
-  explicit UsvControllerComponent(const rclcpp::NodeOptions & options);
-private:
-  std::shared_ptr<std_msgs::msgs::String> display_color_pub_;
-};
+}
 }  // namespace usv_controller
-
-#endif  // USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_

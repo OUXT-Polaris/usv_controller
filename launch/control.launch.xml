@@ -1,0 +1,8 @@
+<launch>
+    <arg name="use_sim_time" default="false"/>
+    <node_container pkg="rclcpp_components" exec="component_container_mt" name="controller_container" namespace="control" args="">
+        <node pkg="playstation_controller_drivers" exec="dualsense_driver_node" name="joy">
+            <param name="use_sim_time" value="$(var use_sim_time)"/>
+        </node>
+    </node_container>
+</launch>

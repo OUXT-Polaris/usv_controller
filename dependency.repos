@@ -3,3 +3,7 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/ouxt_common.git
     version: master
+  playstation_controller_drivers:
+    type: git
+    url: https://github.com/OUXT-Polaris/playstation_controller_drivers.git
+    version: master
