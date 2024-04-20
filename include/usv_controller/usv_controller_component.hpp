@@ -26,6 +26,7 @@ class UsvControllerComponent : public rclcpp::Node
 public:
   USV_CONTROLLER_PUBLIC
   explicit UsvControllerComponent(const rclcpp::NodeOptions & options);
+
 private:
   std::shared_ptr<std_msgs::msgs::String> display_color_pub_;
 };
