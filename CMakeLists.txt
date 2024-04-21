@@ -43,6 +43,14 @@ ament_auto_add_library(usv_controller_component SHARED
 )
 target_link_libraries(usv_controller_component usv_controller_component_parameters)
 
+rclcpp_components_register_nodes(usv_controller_component
+  "usv_controller::UsvControllerComponent")
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+
 # Causes the visibility macros to use dllexport rather than dllimport,
 # which is appropriate when building the dll but not consuming it.
 target_compile_definitions(usv_controller PRIVATE "USV_CONTROLLER_BUILDING_DLL")

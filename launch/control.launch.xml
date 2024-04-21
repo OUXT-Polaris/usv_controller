@@ -1,12 +1,15 @@
 <launch>
     <arg name="use_sim_time" default="false"/>
+    
     <node_container pkg="rclcpp_components" exec="component_container_mt" name="controller_container" namespace="control" args="">
-        <node pkg="playstation_controller_drivers" exec="dualsense_driver_node" name="joy">
+        <composable_node pkg="playstation_controller_drivers" plugin="playstation_controller_drivers::DualsenseDriverComponent" name="joy_node" namespace="control">
             <param name="use_sim_time" value="$(var use_sim_time)"/>
-        </node>
+            <param name="use_intra_process_comms" value="true"/>
+        </composable_node>
 
-        <node pkg="usv_controller" exec="usv_controller_node" name="joy">
+        <composable_node pkg="usv_controller" plugin="usv_controller::UsvControllerComponent" name="controller_node" namespace="control">
             <param name="use_sim_time" value="$(var use_sim_time)"/>
-        </node>
+            <param name="use_intra_process_comms" value="true"/>
+        </composable_node>
     </node_container>
 </launch>

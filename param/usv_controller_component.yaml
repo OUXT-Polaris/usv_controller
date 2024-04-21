@@ -1,5 +1,11 @@
 usv_controller_node:
-  model_type:
+  auto_start:
+    {
+      type: bool,
+      default_value: false,
+      description: "If true, enter autonomous mode when the system starts."
+    }
+  joystick_type:
     {
       type: string,
       default_value: "DuslSense",

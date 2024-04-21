@@ -26,6 +26,8 @@ namespace usv_controller
 {
 class UsvControllerComponent : public rclcpp::Node
 {
+  enum class ControlMode { AUTONOMOUS, MANUAL, EMERGENCY_STOP };
+
 public:
   USV_CONTROLLER_PUBLIC
   explicit UsvControllerComponent(const rclcpp::NodeOptions & options);
@@ -34,6 +36,7 @@ private:
   std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
   const usv_controller_node::Params parameters_;
   p9n_interface::PlayStationInterface joy_interface_;
+  ControlMode control_mode_;
 };
 }  // namespace usv_controller
 

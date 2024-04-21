@@ -19,10 +19,17 @@ namespace usv_controller
 UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & options)
 : Node("usv_controller_node", options),
   parameters_(usv_controller_node::ParamListener(get_node_parameters_interface()).get_params()),
-  joy_interface_(p9n_interface::getHwType("DualSense"))
+  joy_interface_(p9n_interface::getHwType(parameters_.joystick_type)),
+  control_mode_(ControlMode::MANUAL)
 {
+  if (parameters_.auto_start) {
+    control_mode_ = ControlMode::AUTONOMOUS;
+  }
   joy_sub_ = create_subscription<sensor_msgs::msg::Joy>(
     "joy", 10,
     [this](const sensor_msgs::msg::Joy::ConstSharedPtr & msg) { joy_interface_.setJoyMsg(msg); });
 }
 }  // namespace usv_controller
+
+#include <rclcpp_components/register_node_macro.hpp>
+RCLCPP_COMPONENTS_REGISTER_NODE(usv_controller::UsvControllerComponent)
