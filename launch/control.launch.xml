@@ -4,5 +4,9 @@
         <node pkg="playstation_controller_drivers" exec="dualsense_driver_node" name="joy">
             <param name="use_sim_time" value="$(var use_sim_time)"/>
         </node>
+
+        <node pkg="usv_controller" exec="usv_controller_node" name="joy">
+            <param name="use_sim_time" value="$(var use_sim_time)"/>
+        </node>
     </node_container>
 </launch>

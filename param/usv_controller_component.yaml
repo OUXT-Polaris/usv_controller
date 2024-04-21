@@ -1,0 +1,19 @@
+usv_controller_node:
+  model_type:
+    {
+      type: string,
+      default_value: "DuslSense",
+      read_only: true,
+      description: "type of the joystick",
+      validation:
+        {
+          one_of<>:
+            [
+              [
+                "DualShock3",
+                "DualShock4",
+                "DuslSense"
+              ],
+            ],
+        },
+    }

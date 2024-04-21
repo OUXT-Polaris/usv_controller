@@ -15,9 +15,12 @@
 #ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
+#include <p9n_interface/p9n_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <usv_controller/visibility_control.hpp>
+#include <usv_controller_component_parameters.hpp>
 
 namespace usv_controller
 {
@@ -28,7 +31,9 @@ public:
   explicit UsvControllerComponent(const rclcpp::NodeOptions & options);
 
 private:
-  std::shared_ptr<std_msgs::msgs::String> display_color_pub_;
+  std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
+  const usv_controller_node::Params parameters_;
+  p9n_interface::PlayStationInterface joy_interface_;
 };
 }  // namespace usv_controller
 

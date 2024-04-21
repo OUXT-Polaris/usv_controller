@@ -33,9 +33,15 @@ ament_auto_add_library(usv_controller SHARED
   src/usv_joy_controller.cpp
 )
 
-# ament_auto_add_library(usv_controller_component SHARED
-#   src/usv_controller_component.cpp
-# )
+generate_parameter_library(
+  usv_controller_component_parameters
+  param/usv_controller_component.yaml
+)
+
+ament_auto_add_library(usv_controller_component SHARED
+  src/usv_controller_component.cpp
+)
+target_link_libraries(usv_controller_component usv_controller_component_parameters)
 
 # Causes the visibility macros to use dllexport rather than dllimport,
 # which is appropriate when building the dll but not consuming it.

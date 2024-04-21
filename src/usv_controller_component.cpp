@@ -17,7 +17,12 @@
 namespace usv_controller
 {
 UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & options)
-: Node("usv_controller", options)
+: Node("usv_controller_node", options),
+  parameters_(usv_controller_node::ParamListener(get_node_parameters_interface()).get_params()),
+  joy_interface_(p9n_interface::getHwType("DualSense"))
 {
+  joy_sub_ = create_subscription<sensor_msgs::msg::Joy>(
+    "joy", 10,
+    [this](const sensor_msgs::msg::Joy::ConstSharedPtr & msg) { joy_interface_.setJoyMsg(msg); });
 }
 }  // namespace usv_controller
