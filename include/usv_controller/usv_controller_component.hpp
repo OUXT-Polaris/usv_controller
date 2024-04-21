@@ -33,10 +33,51 @@ public:
   explicit UsvControllerComponent(const rclcpp::NodeOptions & options);
 
 private:
+  void watchDogFunction();
   std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
   const usv_controller_node::Params parameters_;
   p9n_interface::PlayStationInterface joy_interface_;
+  std::mutex mtx_;
   ControlMode control_mode_;
+  rclcpp::TimerBase::SharedPtr watchdog_timer_;
+  rclcpp::Time last_joy_timestamp_;
+#define DEFINE_IS_FUNCTION(StateName, StateEnumName) \
+  bool is##StateName() const { return control_mode_ == ControlMode::StateEnumName; }
+
+  DEFINE_IS_FUNCTION(Autonomous, AUTONOMOUS)
+  DEFINE_IS_FUNCTION(Manual, MANUAL)
+  DEFINE_IS_FUNCTION(EmergencyStop, EMERGENCY_STOP)
+
+  bool becomeAutonomous()
+  {
+    if (isManual()) {
+      RCLCPP_INFO_STREAM(get_logger(), "wamv is becom automous.");
+      control_mode_ = ControlMode::AUTONOMOUS;
+      return true;
+    }
+    if (isEmergencyStop()) {
+      RCLCPP_ERROR_STREAM(get_logger(), "wamv is in emergency stop state.");
+    }
+    return false;
+  }
+
+  bool becomeManual()
+  {
+    if (isAutonomous()) {
+      control_mode_ = ControlMode::MANUAL;
+      return true;
+    }
+    if (isEmergencyStop()) {
+      RCLCPP_ERROR_STREAM(get_logger(), "wamv is in emergency stop state.");
+    }
+    return false;
+  }
+
+  bool becomeEmergency()
+  {
+    control_mode_ = ControlMode::EMERGENCY_STOP;
+    return true;
+  }
 };
 }  // namespace usv_controller
 

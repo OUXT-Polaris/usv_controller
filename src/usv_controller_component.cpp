@@ -20,14 +20,45 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
 : Node("usv_controller_node", options),
   parameters_(usv_controller_node::ParamListener(get_node_parameters_interface()).get_params()),
   joy_interface_(p9n_interface::getHwType(parameters_.joystick_type)),
-  control_mode_(ControlMode::MANUAL)
+  control_mode_(ControlMode::MANUAL),
+  last_joy_timestamp_(get_clock()->now())
 {
   if (parameters_.auto_start) {
     control_mode_ = ControlMode::AUTONOMOUS;
   }
   joy_sub_ = create_subscription<sensor_msgs::msg::Joy>(
-    "joy", 10,
-    [this](const sensor_msgs::msg::Joy::ConstSharedPtr & msg) { joy_interface_.setJoyMsg(msg); });
+    "joy", 10, [this](const sensor_msgs::msg::Joy::ConstSharedPtr & msg) {
+      std::lock_guard<std::mutex> lock(mtx_);
+      last_joy_timestamp_ = msg->header.stamp;
+      joy_interface_.setJoyMsg(msg);
+    });
+  using namespace std::chrono_literals;
+  watchdog_timer_ = create_wall_timer(30ms, [this]() { watchDogFunction(); });
+}
+
+void UsvControllerComponent::watchDogFunction()
+{
+  std::lock_guard<std::mutex> lock(mtx_);
+  const auto is_joystick_alive = [this]() {
+    constexpr double e = std::numeric_limits<double>::epsilon();
+    if (std::abs(parameters_.joystick_connection_timeout) <= e) {
+      return true;
+    }
+    return get_clock()->now() - last_joy_timestamp_ >=
+           rclcpp::Duration::from_seconds(parameters_.joystick_connection_timeout);
+  };
+  const auto is_manual_requested = [this]() {
+    return isAutonomous() && joy_interface_.pressedCross();
+  };
+  if (!isEmergencyStop() && is_joystick_alive()) {
+    RCLCPP_ERROR_STREAM(get_logger(), "Joystick disconeected, wamv enters emergency stop mode.");
+    becomeEmergency();
+    return;
+  }
+  if (is_manual_requested()) {
+    becomeManual();
+    return;
+  }
 }
 }  // namespace usv_controller
 

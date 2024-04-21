@@ -3,12 +3,21 @@ usv_controller_node:
     {
       type: bool,
       default_value: false,
+      read_only: true,
       description: "If true, enter autonomous mode when the system starts."
+    }
+  joystick_connection_timeout:
+    {
+      type: double,
+      default_value: 10.0,
+      description: "Timeout of the joystick topic connection. Unit is second. If this value is 0.0, it means no check.",
+      read_only: true,
+      validation: { gt<>: [0.0] }
     }
   joystick_type:
     {
       type: string,
-      default_value: "DuslSense",
+      default_value: "DualSense",
       read_only: true,
       description: "type of the joystick",
       validation:
@@ -18,7 +27,7 @@ usv_controller_node:
               [
                 "DualShock3",
                 "DualShock4",
-                "DuslSense"
+                "DualSense"
               ],
             ],
         },

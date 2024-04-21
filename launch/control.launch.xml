@@ -1,15 +1,20 @@
 <launch>
     <arg name="use_sim_time" default="false"/>
+    <arg name="joystick_type" default="DualSense"/>
+    <arg name="joystick_connection_timeout" default="10.0"/>
     
     <node_container pkg="rclcpp_components" exec="component_container_mt" name="controller_container" namespace="control" args="">
-        <composable_node pkg="playstation_controller_drivers" plugin="playstation_controller_drivers::DualsenseDriverComponent" name="joy_node" namespace="control">
+        <composable_node pkg="joy" plugin="joy::Joy" name="joy_node" namespace="control">
             <param name="use_sim_time" value="$(var use_sim_time)"/>
             <param name="use_intra_process_comms" value="true"/>
+            <param name="autorepeat_rate" value="30.0"/>
         </composable_node>
 
         <composable_node pkg="usv_controller" plugin="usv_controller::UsvControllerComponent" name="controller_node" namespace="control">
             <param name="use_sim_time" value="$(var use_sim_time)"/>
             <param name="use_intra_process_comms" value="true"/>
+            <param name="joystick_type" value="$(var joystick_type)"/>
+            <param name="joystick_connection_timeout" value="$(var joystick_connection_timeout)"/>
         </composable_node>
     </node_container>
 </launch>
