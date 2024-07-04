@@ -16,5 +16,23 @@
             <param name="joystick_type" value="$(var joystick_type)"/>
             <param name="joystick_connection_timeout" value="$(var joystick_connection_timeout)"/>
         </composable_node>
+    
+        <composable_node pkg="udp_driver" plugin="drivers::udp_driver::UdpSenderNode" name="left_thruster_controller_node" namespace="control">
+            <param name="use_sim_time" value="$(var use_sim_time)"/>
+            <param name="use_intra_process_comms" value="true"/>
+            <!-- <param name="ip" value="192.168.0.210"/> -->
+            <param name="ip" value="127.0.0.1"/>
+            <param name="port" value="1000"/>
+            <remap from="udp_write" to="left_thruster_controller_node/udp_write"/>
+        </composable_node>
+
+        <composable_node pkg="udp_driver" plugin="drivers::udp_driver::UdpSenderNode" name="right_thruster_controller_node" namespace="control">
+            <param name="use_sim_time" value="$(var use_sim_time)"/>
+            <param name="use_intra_process_comms" value="true"/>
+            <!-- <param name="ip" value="192.168.0.210"/> -->
+            <param name="ip" value="127.0.0.1"/>
+            <param name="port" value="2000"/>
+            <remap from="udp_write" to="right_thruster_controller_node/udp_write"/>
+        </composable_node>
     </node_container>
 </launch>

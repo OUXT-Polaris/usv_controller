@@ -26,6 +26,11 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
   if (parameters_.auto_start) {
     control_mode_ = ControlMode::AUTONOMOUS;
   }
+  /// @sa https://github.com/ros-drivers/transport_drivers/blob/9fff59f66e4e0f9296501b3f671adc6543509996/udp_driver/src/udp_sender_node.cpp#L72C14-L72C62
+  left_motor_cmd_ = create_publisher<udp_msgs::msg::UdpPacket>(
+    "left_thruster_controller_node/udp_write", rclcpp::QoS(rclcpp::KeepLast(32)).best_effort());
+  right_motor_cmd_ = create_publisher<udp_msgs::msg::UdpPacket>(
+    "right_thruster_controller_node/udp_write", rclcpp::QoS(rclcpp::KeepLast(32)).best_effort());
   joy_sub_ = create_subscription<sensor_msgs::msg::Joy>(
     "joy", 10, [this](const sensor_msgs::msg::Joy::ConstSharedPtr & msg) {
       std::lock_guard<std::mutex> lock(mtx_);

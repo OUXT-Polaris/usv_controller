@@ -19,6 +19,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <udp_driver/udp_driver.hpp>
 #include <usv_controller/visibility_control.hpp>
 #include <usv_controller_component_parameters.hpp>
 
@@ -35,6 +36,8 @@ public:
 private:
   void watchDogFunction();
   std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
+  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> left_motor_cmd_;
+  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> right_motor_cmd_;
   const usv_controller_node::Params parameters_;
   p9n_interface::PlayStationInterface joy_interface_;
   std::mutex mtx_;
