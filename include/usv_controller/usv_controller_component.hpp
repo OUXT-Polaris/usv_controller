@@ -15,6 +15,7 @@
 #ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
+#include <lifecycle_msgs/srv/change_state.hpp>
 #include <p9n_interface/p9n_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joy.hpp>
@@ -36,8 +37,11 @@ public:
 private:
   void watchDogFunction();
   std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
-  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> left_motor_cmd_;
-  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> right_motor_cmd_;
+  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> left_thruster_cmd_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> left_thruster_client_;
+  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> right_thruster_cmd_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> right_thruster_client_;
+
   const usv_controller_node::Params parameters_;
   p9n_interface::PlayStationInterface joy_interface_;
   std::mutex mtx_;
