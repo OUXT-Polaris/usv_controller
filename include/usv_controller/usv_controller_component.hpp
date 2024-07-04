@@ -16,6 +16,7 @@
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
 #include <lifecycle_msgs/srv/change_state.hpp>
+#include <lifecycle_msgs/srv/get_state.hpp>
 #include <p9n_interface/p9n_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joy.hpp>
@@ -38,9 +39,13 @@ private:
   void watchDogFunction();
   std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
   std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> left_thruster_cmd_;
-  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> left_thruster_client_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>>
+    left_thruster_change_state_client_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> left_thruster_get_state_client_;
   std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> right_thruster_cmd_;
-  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> right_thruster_client_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>>
+    right_thruster_change_state_client_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> right_thruster_get_state_client_;
 
   const usv_controller_node::Params parameters_;
   p9n_interface::PlayStationInterface joy_interface_;
@@ -50,6 +55,19 @@ private:
   rclcpp::Time last_joy_timestamp_;
 #define DEFINE_IS_FUNCTION(StateName, StateEnumName) \
   bool is##StateName() const { return control_mode_ == ControlMode::StateEnumName; }
+
+  bool activateThrusterDrivers()
+  {
+    using namespace std::chrono_literals;
+    if (
+      !left_thruster_change_state_client_->wait_for_service(1s) &&
+      !left_thruster_get_state_client_->wait_for_service(1s) &&
+      !right_thruster_change_state_client_->wait_for_service(1s) &&
+      !right_thruster_get_state_client_->wait_for_service(1s)) {
+      return false;
+    }
+    return true;
+  }
 
   DEFINE_IS_FUNCTION(Autonomous, AUTONOMOUS)
   DEFINE_IS_FUNCTION(Manual, MANUAL)

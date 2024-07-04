@@ -26,10 +26,14 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
   if (parameters_.auto_start) {
     control_mode_ = ControlMode::AUTONOMOUS;
   }
-  left_thruster_client_ = create_client<lifecycle_msgs::srv::ChangeState>(
-    "left_thruster_controller_node/get_available_transitions");
-  right_thruster_client_ = create_client<lifecycle_msgs::srv::ChangeState>(
-    "right_thruster_controller_node/get_available_transitions");
+  left_thruster_change_state_client_ =
+    create_client<lifecycle_msgs::srv::ChangeState>("left_thruster_controller_node/change_state");
+  left_thruster_get_state_client_ =
+    create_client<lifecycle_msgs::srv::GetState>("left_thruster_controller_node/get_state");
+  right_thruster_change_state_client_ =
+    create_client<lifecycle_msgs::srv::ChangeState>("right_thruster_controller_node/change_state");
+  right_thruster_get_state_client_ =
+    create_client<lifecycle_msgs::srv::GetState>("right_thruster_controller_node/get_state");
   /// @sa https://github.com/ros-drivers/transport_drivers/blob/9fff59f66e4e0f9296501b3f671adc6543509996/udp_driver/src/udp_sender_node.cpp#L72C14-L72C62
   left_thruster_cmd_ = create_publisher<udp_msgs::msg::UdpPacket>(
     "left_thruster_controller_node/udp_write", rclcpp::QoS(rclcpp::KeepLast(32)).best_effort());
