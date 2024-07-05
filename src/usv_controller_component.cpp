@@ -12,10 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <std_msgs/msg/header.hpp>
 #include <usv_controller/usv_controller_component.hpp>
 
 namespace usv_controller
 {
+udp_msgs::msg::UdpPacket buildPacketMessage(
+  const rclcpp::Time & stamp, const std::string & ip_address, const std::int16_t port,
+  const float value)
+{
+  const auto float_to_uint8_vector = [](float value) {
+    uint8_t * pointer = reinterpret_cast<uint8_t *>(&value);
+    /// @note Size of float is 32 and size of uint8 is 8. So 32/8 = 4
+    return std::vector<uint8_t>(pointer, pointer + 4);
+  };
+  return udp_msgs::build<udp_msgs::msg::UdpPacket>()
+    .header(std_msgs::build<std_msgs::msg::Header>().stamp(stamp).frame_id(""))
+    .address(ip_address)
+    .src_port(port)
+    .data(float_to_uint8_vector(value));
+}
+
 UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & options)
 : Node("usv_controller_node", options),
   parameters_(usv_controller_node::ParamListener(get_node_parameters_interface()).get_params()),
@@ -23,8 +40,9 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
   control_mode_(ControlMode::MANUAL),
   last_joy_timestamp_(get_clock()->now())
 {
+  assert(isManual());
   if (parameters_.auto_start) {
-    control_mode_ = ControlMode::AUTONOMOUS;
+    becomeAutonomous();
   }
   left_thruster_change_state_client_ =
     create_client<lifecycle_msgs::srv::ChangeState>("left_thruster_controller_node/change_state");

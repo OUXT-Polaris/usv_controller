@@ -27,6 +27,10 @@
 
 namespace usv_controller
 {
+udp_msgs::msg::UdpPacket buildPacketMessage(
+  const rclcpp::Time & stamp, const std::string & ip_address, const std::int16_t port,
+  const float value);
+
 class UsvControllerComponent : public rclcpp::Node
 {
   enum class ControlMode { AUTONOMOUS, MANUAL, EMERGENCY_STOP };
