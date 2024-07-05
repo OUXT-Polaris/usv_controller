@@ -56,21 +56,6 @@ private:
 #define DEFINE_IS_FUNCTION(StateName, StateEnumName) \
   bool is##StateName() const { return control_mode_ == ControlMode::StateEnumName; }
 
-  bool activateThrusterDrivers()
-  {
-    using namespace std::chrono_literals;
-    if (
-      !left_thruster_change_state_client_->wait_for_service(1s) &&
-      !left_thruster_get_state_client_->wait_for_service(1s) &&
-      !right_thruster_change_state_client_->wait_for_service(1s) &&
-      !right_thruster_get_state_client_->wait_for_service(1s)) {
-      return false;
-    }
-    auto request_get_state = std::make_shared<lifecycle_msgs::srv::GetState::Request>();
-    auto result = left_thruster_get_state_client_->async_send_request(request_get_state);
-    return true;
-  }
-
   DEFINE_IS_FUNCTION(Autonomous, AUTONOMOUS)
   DEFINE_IS_FUNCTION(Manual, MANUAL)
   DEFINE_IS_FUNCTION(EmergencyStop, EMERGENCY_STOP)
@@ -78,7 +63,7 @@ private:
   bool becomeAutonomous()
   {
     if (isManual()) {
-      RCLCPP_INFO_STREAM(get_logger(), "wamv is becom automous.");
+      RCLCPP_INFO_STREAM(get_logger(), "wamv become autonomous state.");
       control_mode_ = ControlMode::AUTONOMOUS;
       return true;
     }
@@ -92,6 +77,7 @@ private:
   {
     if (isAutonomous()) {
       control_mode_ = ControlMode::MANUAL;
+      RCLCPP_INFO_STREAM(get_logger(), "wamv become manual state.");
       return true;
     }
     if (isEmergencyStop()) {
@@ -102,6 +88,7 @@ private:
 
   bool becomeEmergency()
   {
+    RCLCPP_INFO_STREAM(get_logger(), "wamv become emergency state.");
     control_mode_ = ControlMode::EMERGENCY_STOP;
     return true;
   }

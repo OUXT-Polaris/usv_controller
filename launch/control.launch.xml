@@ -26,8 +26,7 @@
         <composable_node pkg="udp_driver" plugin="drivers::udp_driver::UdpSenderNode" name="left_thruster_controller_node" namespace="control">
             <param name="use_sim_time" value="$(var use_sim_time)"/>
             <param name="use_intra_process_comms" value="true"/>
-            <param name="ip" value="192.168.0.210"/>
-            <param name="ip" value="127.0.0.1"/>
+            <param name="ip" value="192.168.0.200"/>
             <param name="port" value="1000"/>
             <remap from="udp_write" to="left_thruster_controller_node/udp_write"/>
         </composable_node>

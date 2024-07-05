@@ -41,10 +41,13 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
     RCLCPP_INFO_STREAM(get_logger(), "Waiting for service is ready...");
   }
 
+  RCLCPP_INFO_STREAM(get_logger(), "Try activating left thruster driver...");
   TRANSITION_CONFIGURE(left_thruster_change_state_client_);
   TRANSITION_ACTIVATE(left_thruster_change_state_client_);
+  RCLCPP_INFO_STREAM(get_logger(), "Try activating right thruster driver...");
   TRANSITION_CONFIGURE(right_thruster_change_state_client_);
   TRANSITION_ACTIVATE(right_thruster_change_state_client_);
+  RCLCPP_INFO_STREAM(get_logger(), "All thruster drivers are active.");
 
   /// @sa https://github.com/ros-drivers/transport_drivers/blob/9fff59f66e4e0f9296501b3f671adc6543509996/udp_driver/src/udp_sender_node.cpp#L72C14-L72C62
   left_thruster_cmd_ = create_publisher<udp_msgs::msg::UdpPacket>(

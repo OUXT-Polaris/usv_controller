@@ -1,4 +1,31 @@
 usv_controller_node:
+  thrusters:
+    left:
+      ip:
+        {
+          type: string,
+          default_value: 192.168.0.200,
+          read_only: true
+        }
+      port:
+        {
+          type: int,
+          default_value: 1000,
+          read_only: true
+        }
+    right:
+      ip:
+        {
+          type: string,
+          default_value: 192.168.0.210,
+          read_only: true
+        }
+      port:
+        {
+          type: int,
+          default_value: 2000,
+          read_only: true
+        }
   auto_start:
     {
       type: bool,
