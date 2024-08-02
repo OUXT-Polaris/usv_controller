@@ -1,0 +1,98 @@
+  left_azimuth_joint: {
+    type: string,
+    default_value: "left_azimuth_joint",
+    description: "left_azimuth_joint",
+    validation: "left_azimuth_joint"
+  }
+
+  left_azimuth_joint: { 
+    type: string,
+    default_value: "right_azimuth_joint",
+    description: "right_azimuth_joint",
+    validation: "right_azimuth_joint"
+  }
+  left_azimuth_joint: {
+    type: string,
+    default_value: "left_thruster_joint",
+    description: "left_thruster_joint",
+    validation: "left_thruster_joint"
+  }
+  left_azimuth_joint: {
+    type: string,
+    default_value: "right_thruster_joint",
+    description: "right_thruster_joint",
+    validation: "right_thruster_joint"
+  }
+  
+  #変更点
+
+  left_azimuth_joint: {
+    type: string,
+    default_value: "linear_pid_gain.kp",
+    description: "right_thruster_joint",
+    validation: "right_thruster_joint"
+  }
+
+  left_azimuth_joint: {
+    type: string,
+    default_value: "linear_pid_gain.ki",
+    description: "right_thruster_joint",
+    validation: "right_thruster_joint"
+  }
+  left_azimuth_joint: {
+    type: string,
+    default_value: "linear_pid_gain.kd",
+    description: "right_thruster_joint",
+    validation: "right_thruster_joint"
+  }
+
+  left_azimuth_joint: {
+    type: string,
+    default_value: "linear_pid_gain.i_min",
+    description: "right_thruster_joint",
+    validation: "right_thruster_joint"
+  }
+
+  left_azimuth_joint: {
+    type: string,
+    default_value: "linear_pid_gain.i_max",
+    description: "right_thruster_joint",
+    validation: "right_thruster_joint"
+  }
+  
+  left_azimuth_joint: {
+    type: string,
+    default_value: "linear_pid_gain.i_max",
+    description: "right_thruster_joint",
+    validation: "right_thruster_joint"
+  }
+  
+
+  linear_pid_gain.antiwindup: {
+    type: string,
+    default_value: "linear_pid_gain.antiwindup",
+    description: "right_thruster_joint",
+    validation: "right_thruster_joint"
+  }
+
+  anguler_pid_gain.kp: {
+    type: string,
+    default_value: "linear_pid_gain.antiwindup",
+    description: "anguler_pid_gain.kp",
+    validation: "right_thruster_joint"
+  }
+
+  # get_parameter("linear_pid_gain.kp", linear_pid_gain_.p_gain_);
+  # get_parameter("linear_pid_gain.ki", linear_pid_gain_.i_gain_);
+  # get_parameter("linear_pid_gain.kd", linear_pid_gain_.d_gain_);
+  # get_parameter("linear_pid_gain.i_min", linear_pid_gain_.i_min_);
+  # get_parameter("linear_pid_gain.i_max", linear_pid_gain_.i_max_);
+  # get_parameter("linear_pid_gain.antiwindup", linear_pid_gain_.antiwindup_);
+  # get_parameter("anguler_pid_gain.kp", anguler_pid_gain_.p_gain_);
+  # get_parameter("anguler_pid_gain.ki", anguler_pid_gain_.i_gain_);
+  # get_parameter("anguler_pid_gain.kd", anguler_pid_gain_.d_gain_);
+  # get_parameter("anguler_pid_gain.i_min", anguler_pid_gain_.i_min_);
+  # get_parameter("anguler_pid_gain.i_max", anguler_pid_gain_.i_max_);
+  # get_parameter("anguler_pid_gain.antiwindup", anguler_pid_gain_.antiwindup_);
+  # get_parameter("hull_width", hull_width_);
+

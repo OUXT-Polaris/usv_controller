@@ -25,6 +25,7 @@ endif()
 
 
 # find dependencies
+find_package(generate_parameter_library REQUIRED)
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
@@ -33,23 +34,21 @@ ament_auto_add_library(usv_controller SHARED
   src/usv_joy_controller.cpp
 )
 
-generate_parameter_library(
-  usv_controller_component_parameters
-  param/usv_controller_component.yaml
-)
+
+ament_auto_find_build_dependencies()
 
 ament_auto_add_library(usv_controller_component SHARED
   src/usv_controller_component.cpp
 )
-target_link_libraries(usv_controller_component usv_controller_component_parameters)
 
 rclcpp_components_register_nodes(usv_controller_component
-  "usv_controller::UsvControllerComponent")
-
-install(DIRECTORY
-  launch
-  DESTINATION share/${PROJECT_NAME}/
+  "usv_controller::UsvControllerComponent"
 )
+
+ament_auto_add_executable(usv_controller_node
+  src/usv_controller_node.cpp
+)
+
 
 # Causes the visibility macros to use dllexport rather than dllimport,
 # which is appropriate when building the dll but not consuming it.
@@ -66,5 +65,4 @@ endif()
 ament_export_libraries(
   usv_controller
 )
-
 ament_auto_package()
