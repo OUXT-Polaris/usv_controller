@@ -1,0 +1,61 @@
+usv_controller_node:
+  thrusters:
+    left:
+      ip:
+        {
+          type: string,
+          default_value: 192.168.0.200,
+          read_only: true
+        }
+      port:
+        {
+          type: int,
+          default_value: 1000,
+          read_only: true
+        }
+    right:
+      ip:
+        {
+          type: string,
+          default_value: 192.168.0.210,
+          read_only: true
+        }
+      port:
+        {
+          type: int,
+          default_value: 2000,
+          read_only: true
+        }
+  auto_start:
+    {
+      type: bool,
+      default_value: false,
+      read_only: true,
+      description: "If true, enter autonomous mode when the system starts."
+    }
+  joystick_connection_timeout:
+    {
+      type: double,
+      default_value: 10.0,
+      description: "Timeout of the joystick topic connection. Unit is second. If this value is 0.0, it means no check.",
+      read_only: true,
+      validation: { gt<>: [0.0] }
+    }
+  joystick_type:
+    {
+      type: string,
+      default_value: "DualSense",
+      read_only: true,
+      description: "type of the joystick",
+      validation:
+        {
+          one_of<>:
+            [
+              [
+                "DualShock3",
+                "DualShock4",
+                "DualSense"
+              ],
+            ],
+        },
+    }

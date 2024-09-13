@@ -12,63 +12,134 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
-#include <geometry_msgs/msg/twist.hpp>
-#include <memory>
+#include <lifecycle_msgs/srv/change_state.hpp>
+#include <lifecycle_msgs/srv/get_state.hpp>
+#include <p9n_interface/p9n_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
-#include <rclcpp_lifecycle/state.hpp>
-#include <std_msgs/msg/float64.hpp>
-#include <std_msgs/msg/float64_multi_array.hpp>
-#include <string>
+#include <sensor_msgs/msg/joy.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <udp_driver/udp_driver.hpp>
 #include <usv_controller/visibility_control.hpp>
-#include <realtime_tools/realtime_buffer.h>
-#include <control_toolbox/pid.hpp>
-#include <controller_interface/controller_interface.hpp>
+#include <usv_controller_component_parameters.hpp>
 
 namespace usv_controller
 {
+udp_msgs::msg::UdpPacket buildPacketMessage(
+  const rclcpp::Time & stamp, const std::string & ip_address, const std::int16_t port,
+  const float value);
+
 class UsvControllerComponent : public rclcpp::Node
 {
+  enum class ControlMode { AUTONOMOUS, MANUAL, EMERGENCY_STOP };
+
 public:
   USV_CONTROLLER_PUBLIC
   explicit UsvControllerComponent(const rclcpp::NodeOptions & options);
 
 private:
-  // std::shared_ptr<std_msgs::msgs::String> display_color_pub_;
-  std::string left_azimuth_joint_;
-  std::string right_azimuth_joint_;
-  std::string left_thruster_joint_;
-  std::string right_thruster_joint_;
-  std::string logger_name_;
-  
-  //publisher
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr thruster_left_cmd_pub_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr thruster_left_agl_pub_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr thruster_right_cmd_pub_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr thruster_right_agl_pub_;
-  rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr debug_cmd_pub_;
-  //subscriber
-  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr target_twist_sub_;
-  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr current_twist_sub_;
-  //timer
-  rclcpp::TimerBase::SharedPtr timer_;
+  void watchDogFunction();
+  std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
+  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> left_thruster_cmd_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>>
+    left_thruster_change_state_client_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> left_thruster_get_state_client_;
+  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> right_thruster_cmd_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>>
+    right_thruster_change_state_client_;
+  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> right_thruster_get_state_client_;
 
-  std::optional<geometry_msgs::msg::Twist> target_twist_;
-  std::optional<geometry_msgs::msg::Twist> current_twist_;
-  
-  using PidSharedPtr = std::shared_ptr<control_toolbox::Pid>;
-  control_toolbox::Pid::Gains linear_pid_gain_;
-  PidSharedPtr linear_pid_ = {nullptr};
-  control_toolbox::Pid::Gains anguler_pid_gain_;
-  PidSharedPtr anguler_pid_ = {nullptr};
-  double hull_width_;
-  void target_twist_cb(const geometry_msgs::msg::Twist & msg);
-  void update();
-};
+  const usv_controller_node::Params parameters_;
+  p9n_interface::PlayStationInterface joy_interface_;
+  std::mutex mtx_;
+  ControlMode control_mode_;
+  rclcpp::TimerBase::SharedPtr watchdog_timer_;
+  rclcpp::Time last_joy_timestamp_;
+#define DEFINE_IS_FUNCTION(StateName, StateEnumName) \
+  bool is##StateName() const { return control_mode_ == ControlMode::StateEnumName; }
+
+  DEFINE_IS_FUNCTION(Autonomous, AUTONOMOUS)
+  DEFINE_IS_FUNCTION(Manual, MANUAL)
+  DEFINE_IS_FUNCTION(EmergencyStop, EMERGENCY_STOP)
+
+  bool becomeAutonomous()
+  {
+    if (isManual()) {
+      RCLCPP_INFO_STREAM(get_logger(), "wamv become autonomous state.");
+      control_mode_ = ControlMode::AUTONOMOUS;
+      return true;
+    }
+    if (isEmergencyStop()) {
+      RCLCPP_ERROR_STREAM(get_logger(), "wamv is in emergency stop state.");
+    }
+    return false;
+  }
+
+  bool becomeManual()
+  {
+    if (isAutonomous()) {
+      control_mode_ = ControlMode::MANUAL;
+      RCLCPP_INFO_STREAM(get_logger(), "wamv become manual state.");
+      return true;
+    }
+    if (isEmergencyStop()) {
+      RCLCPP_ERROR_STREAM(get_logger(), "wamv is in emergency stop state.");
+    }
+    return false;
+  }
+
+  bool becomeEmergency()
+  {
+    RCLCPP_INFO_STREAM(get_logger(), "wamv become emergency state.");
+    control_mode_ = ControlMode::EMERGENCY_STOP;
+    return true;
+  }
+
+#define DEFINE_IS_STATE_FUNCTION(STATE_NAME)                                                  \
+  bool is##STATE_NAME##State(                                                                 \
+    std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> & client)                  \
+  {                                                                                           \
+    using namespace std::chrono_literals;                                                     \
+    if (!client->wait_for_service(1s)) {                                                      \
+      return false;                                                                           \
+    }                                                                                         \
+    auto result =                                                                             \
+      client->async_send_request(std::make_shared<lifecycle_msgs::srv::GetState::Request>()); \
+    auto return_code = rclcpp::spin_until_future_complete(get_node_base_interface(), result); \
+    if (                                                                                      \
+      return_code == rclcpp::FutureReturnCode::SUCCESS &&                                     \
+      result.get()->current_state.id == lifecycle_msgs::msg::State::STATE_NAME) {             \
+      return true;                                                                            \
+    }                                                                                         \
+    return false;                                                                             \
+  }
+
+  DEFINE_IS_STATE_FUNCTION(PRIMARY_STATE_UNKNOWN);
+  DEFINE_IS_STATE_FUNCTION(PRIMARY_STATE_UNCONFIGURED);
+  DEFINE_IS_STATE_FUNCTION(PRIMARY_STATE_INACTIVE);
+
+#define DEFINE_TRANSITION_FUNCTION(TRANSITION_NAME)                                                \
+  bool TRANSITION_NAME(std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> & client) \
+  {                                                                                                \
+    using namespace std::chrono_literals;                                                          \
+    if (!client->wait_for_service(1s)) {                                                           \
+      return false;                                                                                \
+    }                                                                                              \
+    auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();                  \
+    request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_NAME;                     \
+    auto result = client->async_send_request(request);                                             \
+    auto return_code = rclcpp::spin_until_future_complete(get_node_base_interface(), result);      \
+    if (return_code == rclcpp::FutureReturnCode::SUCCESS && result.get()->success) {               \
+      return true;                                                                                 \
+    }                                                                                              \
+    return false;                                                                                  \
+  }
+
+  DEFINE_TRANSITION_FUNCTION(TRANSITION_CONFIGURE)
+  DEFINE_TRANSITION_FUNCTION(TRANSITION_ACTIVATE)
+};  // namespace usv_controller
 }  // namespace usv_controller
 
 #endif  // USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_

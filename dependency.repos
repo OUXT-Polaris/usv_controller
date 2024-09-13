@@ -7,3 +7,7 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/playstation_controller_drivers.git
     version: master
+  playstation_joy_interface_ros2:
+    type: git
+    url: https://github.com/HarvestX/PlayStation-JoyInterface-ROS2.git
+    version: humble
