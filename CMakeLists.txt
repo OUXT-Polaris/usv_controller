@@ -30,14 +30,7 @@ find_package(Boost REQUIRED thread)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
-set(PROTO_FILES
-  "proto/thruster_command.proto"
-)
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
-include_directories(
-  include
-  ${CMAKE_BINARY_DIR}
-)
+add_protolink_message("proto/thruster_command.proto" thruster_command)
 
 ament_auto_add_library(usv_controller SHARED
   src/usv_velocity_controller.cpp
@@ -51,11 +44,9 @@ generate_parameter_library(
 
 ament_auto_add_library(usv_controller_component SHARED
   src/usv_controller_component.cpp
-  ${PROTO_SRCS}
 )
 target_link_libraries(usv_controller_component 
-  usv_controller_component_parameters
-  ${PROTOBUF_LIBRARY})
+  usv_controller_component_parameters)
 
 rclcpp_components_register_nodes(usv_controller_component
   "usv_controller::UsvControllerComponent")

@@ -27,10 +27,6 @@
 
 namespace usv_controller
 {
-udp_msgs::msg::UdpPacket buildPacketMessage(
-  const rclcpp::Time & stamp, const std::string & ip_address, const std::int16_t port,
-  const float value);
-
 class UsvControllerComponent : public rclcpp::Node
 {
   enum class ControlMode { AUTONOMOUS, MANUAL, EMERGENCY_STOP };
@@ -42,14 +38,6 @@ public:
 private:
   void watchDogFunction();
   std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
-  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> left_thruster_cmd_;
-  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>>
-    left_thruster_change_state_client_;
-  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> left_thruster_get_state_client_;
-  std::shared_ptr<rclcpp::Publisher<udp_msgs::msg::UdpPacket>> right_thruster_cmd_;
-  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>>
-    right_thruster_change_state_client_;
-  std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> right_thruster_get_state_client_;
 
   const usv_controller_node::Params parameters_;
   p9n_interface::PlayStationInterface joy_interface_;
