@@ -26,6 +26,7 @@
   <depend>p9n_interface</depend>
   <depend>generate_parameter_library</depend>
   <depend>udp_driver</depend>
+  <depend>boost</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ouxt_lint_common</test_depend>

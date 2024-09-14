@@ -26,7 +26,18 @@ endif()
 
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
+find_package(Boost REQUIRED thread)
+include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
+
+set(PROTO_FILES
+  "proto/thruster_command.proto"
+)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
+include_directories(
+  include
+  ${CMAKE_BINARY_DIR}
+)
 
 ament_auto_add_library(usv_controller SHARED
   src/usv_velocity_controller.cpp
@@ -40,8 +51,11 @@ generate_parameter_library(
 
 ament_auto_add_library(usv_controller_component SHARED
   src/usv_controller_component.cpp
+  ${PROTO_SRCS}
 )
-target_link_libraries(usv_controller_component usv_controller_component_parameters)
+target_link_libraries(usv_controller_component 
+  usv_controller_component_parameters
+  ${PROTOBUF_LIBRARY})
 
 rclcpp_components_register_nodes(usv_controller_component
   "usv_controller::UsvControllerComponent")

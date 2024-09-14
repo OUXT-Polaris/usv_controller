@@ -96,49 +96,6 @@ private:
     control_mode_ = ControlMode::EMERGENCY_STOP;
     return true;
   }
-
-#define DEFINE_IS_STATE_FUNCTION(STATE_NAME)                                                  \
-  bool is##STATE_NAME##State(                                                                 \
-    std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> & client)                  \
-  {                                                                                           \
-    using namespace std::chrono_literals;                                                     \
-    if (!client->wait_for_service(1s)) {                                                      \
-      return false;                                                                           \
-    }                                                                                         \
-    auto result =                                                                             \
-      client->async_send_request(std::make_shared<lifecycle_msgs::srv::GetState::Request>()); \
-    auto return_code = rclcpp::spin_until_future_complete(get_node_base_interface(), result); \
-    if (                                                                                      \
-      return_code == rclcpp::FutureReturnCode::SUCCESS &&                                     \
-      result.get()->current_state.id == lifecycle_msgs::msg::State::STATE_NAME) {             \
-      return true;                                                                            \
-    }                                                                                         \
-    return false;                                                                             \
-  }
-
-  DEFINE_IS_STATE_FUNCTION(PRIMARY_STATE_UNKNOWN);
-  DEFINE_IS_STATE_FUNCTION(PRIMARY_STATE_UNCONFIGURED);
-  DEFINE_IS_STATE_FUNCTION(PRIMARY_STATE_INACTIVE);
-
-#define DEFINE_TRANSITION_FUNCTION(TRANSITION_NAME)                                                \
-  bool TRANSITION_NAME(std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> & client) \
-  {                                                                                                \
-    using namespace std::chrono_literals;                                                          \
-    if (!client->wait_for_service(1s)) {                                                           \
-      return false;                                                                                \
-    }                                                                                              \
-    auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();                  \
-    request->transition.id = lifecycle_msgs::msg::Transition::TRANSITION_NAME;                     \
-    auto result = client->async_send_request(request);                                             \
-    auto return_code = rclcpp::spin_until_future_complete(get_node_base_interface(), result);      \
-    if (return_code == rclcpp::FutureReturnCode::SUCCESS && result.get()->success) {               \
-      return true;                                                                                 \
-    }                                                                                              \
-    return false;                                                                                  \
-  }
-
-  DEFINE_TRANSITION_FUNCTION(TRANSITION_CONFIGURE)
-  DEFINE_TRANSITION_FUNCTION(TRANSITION_ACTIVATE)
 };  // namespace usv_controller
 }  // namespace usv_controller
 
