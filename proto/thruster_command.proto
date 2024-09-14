@@ -5,3 +5,13 @@ package communication;
 message Thrust {
   double thrust = 1;
 }
+
+message EmergencyStop {
+}
+
+message Command {
+  oneof command {
+    Thrust thrust = 1;
+    EmergencyStop emergency_stop = 2;
+  }
+}
