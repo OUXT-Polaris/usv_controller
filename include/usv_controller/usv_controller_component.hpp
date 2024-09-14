@@ -15,13 +15,11 @@
 #ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
-#include <lifecycle_msgs/srv/change_state.hpp>
-#include <lifecycle_msgs/srv/get_state.hpp>
 #include <p9n_interface/p9n_interface.hpp>
+#include <protolink/client.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <udp_driver/udp_driver.hpp>
 #include <usv_controller/visibility_control.hpp>
 #include <usv_controller_component_parameters.hpp>
 
