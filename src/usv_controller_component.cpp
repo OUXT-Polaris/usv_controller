@@ -70,7 +70,7 @@ void UsvControllerComponent::controlFunction()
       send_command(0, 0);
       break;
     case ControlMode::EMERGENCY_STOP:
-      send_command(0, 0);
+      send_command(std::nan(""), std::nan(""));
       break;
   }
 }
