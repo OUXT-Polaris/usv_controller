@@ -15,6 +15,8 @@
 #ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
+#include <thruster_command.pb.h>
+
 #include <p9n_interface/p9n_interface.hpp>
 #include <protolink/client.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -39,6 +41,7 @@ private:
 
   const usv_controller_node::Params parameters_;
   p9n_interface::PlayStationInterface joy_interface_;
+  protolink::udp::Client left_thruster_client_;
   std::mutex mtx_;
   ControlMode control_mode_;
   rclcpp::TimerBase::SharedPtr watchdog_timer_;

@@ -20,6 +20,7 @@ namespace usv_controller
 UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & options)
 : Node("usv_controller_node", options),
   parameters_(usv_controller_node::ParamListener(get_node_parameters_interface()).get_params()),
+  left_thruster_client_(parameters_.thrusters.left.ip, parameters_.thrusters.left.port),
   joy_interface_(p9n_interface::getHwType(parameters_.joystick_type)),
   control_mode_(ControlMode::MANUAL),
   last_joy_timestamp_(get_clock()->now())
