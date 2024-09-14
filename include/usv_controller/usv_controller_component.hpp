@@ -37,14 +37,17 @@ public:
 
 private:
   void watchDogFunction();
+  void controlFunction();
   std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
 
   const usv_controller_node::Params parameters_;
   p9n_interface::PlayStationInterface joy_interface_;
   protolink::udp::Client left_thruster_client_;
+  protolink::udp::Client right_thruster_client_;
   std::mutex mtx_;
   ControlMode control_mode_;
   rclcpp::TimerBase::SharedPtr watchdog_timer_;
+  rclcpp::TimerBase::SharedPtr control_timer_;
   rclcpp::Time last_joy_timestamp_;
 #define DEFINE_IS_FUNCTION(StateName, StateEnumName) \
   bool is##StateName() const { return control_mode_ == ControlMode::StateEnumName; }

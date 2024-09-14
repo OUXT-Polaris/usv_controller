@@ -20,8 +20,9 @@ namespace usv_controller
 UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & options)
 : Node("usv_controller_node", options),
   parameters_(usv_controller_node::ParamListener(get_node_parameters_interface()).get_params()),
-  left_thruster_client_(parameters_.thrusters.left.ip, parameters_.thrusters.left.port),
   joy_interface_(p9n_interface::getHwType(parameters_.joystick_type)),
+  left_thruster_client_(parameters_.thrusters.left.ip, parameters_.thrusters.left.port),
+  right_thruster_client_(parameters_.thrusters.left.ip, parameters_.thrusters.left.port),
   control_mode_(ControlMode::MANUAL),
   last_joy_timestamp_(get_clock()->now())
 {
@@ -37,6 +38,34 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
     });
   using namespace std::chrono_literals;
   watchdog_timer_ = create_wall_timer(30ms, [this]() { watchDogFunction(); });
+}
+
+void UsvControllerComponent::controlFunction()
+{
+  std::lock_guard<std::mutex> lock(mtx_);
+  const auto send_command = [this](const double left_thrust, const double right_thrust) {
+    const auto build_command = [](const double thrust) {
+      communication::Thrust command;
+      command.set_thrust(thrust);
+      return command;
+    };
+
+    left_thruster_client_.send(build_command(left_thrust));
+    right_thruster_client_.send(build_command(right_thrust));
+  };
+
+  switch (control_mode_) {
+    case ControlMode::MANUAL:
+      send_command(joy_interface_.tiltedStickLY(), joy_interface_.tiltedStickRY());
+      break;
+    case ControlMode::AUTONOMOUS:
+      // @todo input thrust value from velocity controller.
+      send_command(0, 0);
+      break;
+    case ControlMode::EMERGENCY_STOP:
+      send_command(0, 0);
+      break;
+  }
 }
 
 void UsvControllerComponent::watchDogFunction()
