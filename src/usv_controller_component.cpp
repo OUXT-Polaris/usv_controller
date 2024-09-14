@@ -45,8 +45,15 @@ void UsvControllerComponent::controlFunction()
   std::lock_guard<std::mutex> lock(mtx_);
   const auto send_command = [this](const double left_thrust, const double right_thrust) {
     const auto build_command = [](const double thrust) {
-      communication::Thrust command;
-      command.set_thrust(thrust);
+      communication::Command command;
+      if(std::isnan(thrust)) {
+        *command.mutable_emergency_stop() = communication::EmergencyStop();
+      }
+      else {
+        communication::Thrust thrust_command;
+        thrust_command.set_thrust(thrust);
+        *command.mutable_thrust() = thrust_command;
+      }
       return command;
     };
 
