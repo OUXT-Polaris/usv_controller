@@ -41,6 +41,7 @@ private:
   std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Joy>> joy_sub_;
 
   const usv_controller_node::Params parameters_;
+  bool joy_subscribed_ = false;
   p9n_interface::PlayStationInterface joy_interface_;
   protolink::udp::Client left_thruster_client_;
   protolink::udp::Client right_thruster_client_;

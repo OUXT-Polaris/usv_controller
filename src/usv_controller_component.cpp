@@ -22,7 +22,7 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
   parameters_(usv_controller_node::ParamListener(get_node_parameters_interface()).get_params()),
   joy_interface_(p9n_interface::getHwType(parameters_.joystick_type)),
   left_thruster_client_(parameters_.thrusters.left.ip, parameters_.thrusters.left.port),
-  right_thruster_client_(parameters_.thrusters.left.ip, parameters_.thrusters.left.port),
+  right_thruster_client_(parameters_.thrusters.right.ip, parameters_.thrusters.right.port),
   control_mode_(ControlMode::MANUAL),
   last_joy_timestamp_(get_clock()->now())
 {
@@ -35,24 +35,28 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
       std::lock_guard<std::mutex> lock(mtx_);
       last_joy_timestamp_ = msg->header.stamp;
       joy_interface_.setJoyMsg(msg);
+      joy_subscribed_ = true;
     });
   using namespace std::chrono_literals;
   watchdog_timer_ = create_wall_timer(30ms, [this]() { watchDogFunction(); });
+  control_timer_ = create_wall_timer(50ms, [this]() { controlFunction(); });
 }
 
 void UsvControllerComponent::controlFunction()
 {
   std::lock_guard<std::mutex> lock(mtx_);
+  if(!joy_subscribed_) {
+    return;
+  }
   const auto send_command = [this](const double left_thrust, const double right_thrust) {
     const auto build_command = [](const double thrust) {
       communication::Command command;
-      if(std::isnan(thrust)) {
-        *command.mutable_emergency_stop() = communication::EmergencyStop();
-      }
-      else {
-        communication::Thrust thrust_command;
-        thrust_command.set_thrust(thrust);
-        *command.mutable_thrust() = thrust_command;
+      if (std::isnan(thrust)) {
+        command.set_thrust(0.0);
+        // command.set_emergency_stop(true);
+      } else {
+        command.set_thrust(thrust);
+        // command.set_emergency_stop(false);
       }
       return command;
     };
@@ -89,10 +93,17 @@ void UsvControllerComponent::watchDogFunction()
   const auto is_manual_requested = [this]() {
     return isAutonomous() && joy_interface_.pressedCross();
   };
-  if (!isEmergencyStop() && is_joystick_alive()) {
-    RCLCPP_ERROR_STREAM(get_logger(), "Joystick disconeected, wamv enters emergency stop mode.");
-    becomeEmergency();
-    return;
+  if (!isEmergencyStop()) {
+    if (is_joystick_alive()) {
+      RCLCPP_ERROR_STREAM(get_logger(), "Joystick disconeected, wamv enters emergency stop mode.");
+      becomeEmergency();
+      return;
+    }
+    if (joy_interface_.pressedSquare() && joy_interface_.pressedCross()) {
+      RCLCPP_ERROR_STREAM(get_logger(), "Manual emergency stop.");
+      becomeEmergency();
+      return;
+    }
   }
   if (is_manual_requested()) {
     becomeManual();

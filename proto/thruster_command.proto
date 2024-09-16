@@ -2,16 +2,7 @@ syntax = "proto3";
 
 package communication;
 
-message Thrust {
-  double thrust = 1;
-}
-
-message EmergencyStop {
-}
-
 message Command {
-  oneof command {
-    Thrust thrust = 1;
-    EmergencyStop emergency_stop = 2;
-  }
+  double thrust = 1;
+  bool emergency_stop = 2;
 }

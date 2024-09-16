@@ -46,7 +46,7 @@ ament_auto_add_library(usv_controller_component SHARED
   src/usv_controller_component.cpp
 )
 target_link_libraries(usv_controller_component 
-  usv_controller_component_parameters)
+  usv_controller_component_parameters thruster_command)
 
 rclcpp_components_register_nodes(usv_controller_component
   "usv_controller::UsvControllerComponent")

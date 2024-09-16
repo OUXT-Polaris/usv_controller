@@ -10,7 +10,7 @@ usv_controller_node:
       port:
         {
           type: int,
-          default_value: 1000,
+          default_value: 2000,
           read_only: true
         }
     right:
@@ -23,7 +23,7 @@ usv_controller_node:
       port:
         {
           type: int,
-          default_value: 2000,
+          default_value: 2100,
           read_only: true
         }
   auto_start:
