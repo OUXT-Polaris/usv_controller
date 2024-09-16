@@ -53,10 +53,10 @@ void UsvControllerComponent::controlFunction()
       communication::Command command;
       if (std::isnan(thrust)) {
         command.set_thrust(0.0);
-        // command.set_emergency_stop(true);
+        command.set_emergency_stop(true);
       } else {
         command.set_thrust(thrust);
-        // command.set_emergency_stop(false);
+        command.set_emergency_stop(false);
       }
       return command;
     };
@@ -82,6 +82,9 @@ void UsvControllerComponent::controlFunction()
 void UsvControllerComponent::watchDogFunction()
 {
   std::lock_guard<std::mutex> lock(mtx_);
+  if(!joy_subscribed_) {
+    return;
+  }
   const auto is_joystick_alive = [this]() {
     constexpr double e = std::numeric_limits<double>::epsilon();
     if (std::abs(parameters_.joystick_connection_timeout) <= e) {
