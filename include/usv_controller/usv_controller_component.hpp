@@ -43,8 +43,8 @@ private:
   const usv_controller_node::Params parameters_;
   bool joy_subscribed_ = false;
   p9n_interface::PlayStationInterface joy_interface_;
-  protolink::udp_protocol::Client left_thruster_client_;
-  protolink::udp_protocol::Client right_thruster_client_;
+  protolink::udp_protocol::Publisher left_thruster_publisher_;
+  protolink::udp_protocol::Publisher right_thruster_publisher_;
   std::mutex mtx_;
   ControlMode control_mode_;
   rclcpp::TimerBase::SharedPtr watchdog_timer_;

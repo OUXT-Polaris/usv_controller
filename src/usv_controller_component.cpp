@@ -21,8 +21,8 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
 : Node("usv_controller_node", options),
   parameters_(usv_controller_node::ParamListener(get_node_parameters_interface()).get_params()),
   joy_interface_(p9n_interface::getHwType(parameters_.joystick_type)),
-  left_thruster_client_(parameters_.thrusters.left.ip, parameters_.thrusters.left.port),
-  right_thruster_client_(parameters_.thrusters.right.ip, parameters_.thrusters.right.port),
+  left_thruster_publisher_(parameters_.thrusters.left.ip, parameters_.thrusters.left.port),
+  right_thruster_publisher_(parameters_.thrusters.right.ip, parameters_.thrusters.right.port),
   control_mode_(ControlMode::MANUAL),
   last_joy_timestamp_(get_clock()->now())
 {
@@ -45,7 +45,7 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
 void UsvControllerComponent::controlFunction()
 {
   std::lock_guard<std::mutex> lock(mtx_);
-  if(!joy_subscribed_) {
+  if (!joy_subscribed_) {
     return;
   }
   const auto send_command = [this](const double left_thrust, const double right_thrust) {
@@ -61,8 +61,8 @@ void UsvControllerComponent::controlFunction()
       return command;
     };
 
-    left_thruster_client_.send(build_command(left_thrust));
-    right_thruster_client_.send(build_command(right_thrust));
+    left_thruster_publisher_.send(build_command(left_thrust));
+    right_thruster_publisher_.send(build_command(right_thrust));
   };
 
   switch (control_mode_) {
@@ -82,7 +82,7 @@ void UsvControllerComponent::controlFunction()
 void UsvControllerComponent::watchDogFunction()
 {
   std::lock_guard<std::mutex> lock(mtx_);
-  if(!joy_subscribed_) {
+  if (!joy_subscribed_) {
     return;
   }
   const auto is_joystick_alive = [this]() {
