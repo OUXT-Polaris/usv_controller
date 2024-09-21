@@ -4,7 +4,7 @@ usv_controller_node:
       ip:
         {
           type: string,
-          default_value: 192.168.0.200,
+          default_value: 192.168.0.201,
           read_only: true
         }
       port:
@@ -17,13 +17,13 @@ usv_controller_node:
       ip:
         {
           type: string,
-          default_value: 192.168.0.210,
+          default_value: 192.168.0.211,
           read_only: true
         }
       port:
         {
           type: int,
-          default_value: 2100,
+          default_value: 2000,
           read_only: true
         }
   auto_start:

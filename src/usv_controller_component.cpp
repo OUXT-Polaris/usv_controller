@@ -21,8 +21,8 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
 : Node("usv_controller_node", options),
   parameters_(usv_controller_node::ParamListener(get_node_parameters_interface()).get_params()),
   joy_interface_(p9n_interface::getHwType(parameters_.joystick_type)),
-  left_thruster_publisher_(parameters_.thrusters.left.ip, parameters_.thrusters.left.port),
-  right_thruster_publisher_(parameters_.thrusters.right.ip, parameters_.thrusters.right.port),
+  left_thruster_publisher_(io_, parameters_.thrusters.left.ip, parameters_.thrusters.left.port, 2000),
+  right_thruster_publisher_(io_, parameters_.thrusters.right.ip, parameters_.thrusters.right.port, 2001),
   control_mode_(ControlMode::MANUAL),
   last_joy_timestamp_(get_clock()->now())
 {
@@ -60,6 +60,8 @@ void UsvControllerComponent::controlFunction()
       }
       return command;
     };
+
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("HOGE"), "Thrust : " << left_thrust << "," << right_thrust);
 
     left_thruster_publisher_.send(build_command(left_thrust));
     right_thruster_publisher_.send(build_command(right_thrust));
