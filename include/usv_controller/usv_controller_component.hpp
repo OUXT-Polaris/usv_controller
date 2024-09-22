@@ -15,7 +15,7 @@
 #ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
-#include <thruster_command.pb.h>
+#include <usv_controller/thruster_command.pb.h>
 
 #include <p9n_interface/p9n_interface.hpp>
 #include <protolink/client.hpp>

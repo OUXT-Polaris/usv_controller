@@ -30,8 +30,8 @@ find_package(Boost REQUIRED thread)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
-add_protolink_message("proto/thruster_command.proto" "thruster_command")
-add_protolink_message_from_ros_message("std_msgs" "String")
+# add_protolink_message("proto/thruster_command.proto" "thruster_command")
+# add_protolink_message_from_ros_message("std_msgs" "String")
 
 ament_auto_add_library(usv_controller SHARED
   src/usv_velocity_controller.cpp
@@ -45,9 +45,10 @@ generate_parameter_library(
 
 ament_auto_add_library(usv_controller_component SHARED
   src/usv_controller_component.cpp
+  src/thruster_command.pb.cc
 )
 target_link_libraries(usv_controller_component 
-  usv_controller_component_parameters thruster_command)
+  usv_controller_component_parameters ${PROTOBUF_LIBRARY})
 
 rclcpp_components_register_nodes(usv_controller_component
   "usv_controller::UsvControllerComponent")
