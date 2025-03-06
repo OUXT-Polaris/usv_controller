@@ -22,6 +22,10 @@ namespace usv_controller
 UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & options)
 : Node("usv_controller", options)
 {
+  target_twist_sub_ = create_subscription<geometry_msgs::msg::Twist>(
+    "target_twist", 1, [this](const geometry_msgs::msg::Twist & msg) { target_twist_ = msg; });
+  current_twist_sub_ = create_subscription<geometry_msgs::msg::Twist>(
+    "current_twist", 1, [this](const geometry_msgs::msg::Twist & msg) { current_twist_ = msg; });
 }
 }  // namespace usv_controller
 

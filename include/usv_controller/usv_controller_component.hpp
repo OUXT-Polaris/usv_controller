@@ -30,8 +30,10 @@ public:
   explicit UsvControllerComponent(const rclcpp::NodeOptions & options);
 
 private:
-  std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> target_speed_sub_;
-  std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> current_speed_sub_;
+  std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> target_twist_sub_;
+  std::optional<geometry_msgs::msg::Twist> target_twist_;
+  std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> current_twist_sub_;
+  std::optional<geometry_msgs::msg::Twist> current_twist_;
 };
 }  // namespace usv_controller
 
