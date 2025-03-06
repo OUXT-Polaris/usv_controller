@@ -16,8 +16,7 @@
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/joy.hpp>
-#include <std_msgs/msg/string.hpp>
+#include <hardware_communication_msgs/msg/motor_control.hpp>
 
 namespace usv_controller
 {

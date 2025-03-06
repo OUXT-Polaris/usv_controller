@@ -7,3 +7,7 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/playstation_controller_drivers.git
     version: master
+  protolink:
+    type: git
+    url: https://github.com/OUXT-Polaris/protolink.git
+    version: master
