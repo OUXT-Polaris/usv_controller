@@ -15,7 +15,9 @@
 #ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
+#include <geometry_msgs/msg/twist.hpp>
 #include <hardware_communication_msgs/msg/motor_control.hpp>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <usv_controller/visibility_control.hpp>
 
@@ -28,6 +30,8 @@ public:
   explicit UsvControllerComponent(const rclcpp::NodeOptions & options);
 
 private:
+  std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> target_speed_sub_;
+  std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> current_speed_sub_;
 };
 }  // namespace usv_controller
 

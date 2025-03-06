@@ -14,6 +14,9 @@
 
 #include <usv_controller/usv_controller_component.hpp>
 
+// Headers in ROS2
+#include <rclcpp_components/register_node_macro.hpp>
+
 namespace usv_controller
 {
 UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & options)
@@ -21,3 +24,5 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
 {
 }
 }  // namespace usv_controller
+
+RCLCPP_COMPONENTS_REGISTER_NODE(usv_controller::UsvControllerComponent)

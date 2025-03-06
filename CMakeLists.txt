@@ -32,6 +32,8 @@ ament_auto_add_library(usv_controller_component SHARED
   src/usv_controller_component.cpp
 )
 
+rclcpp_components_register_nodes(usv_controller_component "usv_controller_component::UsvControllerComponent")
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
