@@ -15,8 +15,9 @@
 #ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
-#include <rclcpp/rclcpp.hpp>
 #include <hardware_communication_msgs/msg/motor_control.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <usv_controller/visibility_control.hpp>
 
 namespace usv_controller
 {
@@ -27,7 +28,6 @@ public:
   explicit UsvControllerComponent(const rclcpp::NodeOptions & options);
 
 private:
-  std::shared_ptr<std_msgs::msgs::String> display_color_pub_;
 };
 }  // namespace usv_controller
 
