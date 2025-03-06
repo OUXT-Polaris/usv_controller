@@ -20,6 +20,7 @@
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <usv_controller/visibility_control.hpp>
+#include <control_toolbox/pid.hpp>
 
 namespace usv_controller
 {
@@ -34,6 +35,13 @@ private:
   std::optional<geometry_msgs::msg::Twist> target_twist_;
   std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> current_twist_sub_;
   std::optional<geometry_msgs::msg::Twist> current_twist_;
+  using PidSharedPtr = std::shared_ptr<control_toolbox::Pid>;
+  rclcpp::TimerBase::SharedPtr timer_;
+  control_toolbox::Pid::Gains linear_pid_gain_;
+  PidSharedPtr linear_pid_ = {nullptr};
+  control_toolbox::Pid::Gains anguler_pid_gain_;
+  PidSharedPtr anguler_pid_ = {nullptr};
+  double hull_width_;
 };
 }  // namespace usv_controller
 

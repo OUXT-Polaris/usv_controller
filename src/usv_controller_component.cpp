@@ -22,10 +22,29 @@ namespace usv_controller
 UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & options)
 : Node("usv_controller", options)
 {
+  get_parameter("linear_pid_gain.kp", linear_pid_gain_.p_gain_);
+  get_parameter("linear_pid_gain.ki", linear_pid_gain_.i_gain_);
+  get_parameter("linear_pid_gain.kd", linear_pid_gain_.d_gain_);
+  get_parameter("linear_pid_gain.i_min", linear_pid_gain_.i_min_);
+  get_parameter("linear_pid_gain.i_max", linear_pid_gain_.i_max_);
+  get_parameter("linear_pid_gain.antiwindup", linear_pid_gain_.antiwindup_);
+  get_parameter("anguler_pid_gain.kp", anguler_pid_gain_.p_gain_);
+  get_parameter("anguler_pid_gain.ki", anguler_pid_gain_.i_gain_);
+  get_parameter("anguler_pid_gain.kd", anguler_pid_gain_.d_gain_);
+  get_parameter("anguler_pid_gain.i_min", anguler_pid_gain_.i_min_);
+  get_parameter("anguler_pid_gain.i_max", anguler_pid_gain_.i_max_);
+  get_parameter("anguler_pid_gain.antiwindup", anguler_pid_gain_.antiwindup_);
+  get_parameter("hull_width", hull_width_);
   target_twist_sub_ = create_subscription<geometry_msgs::msg::Twist>(
     "target_twist", 1, [this](const geometry_msgs::msg::Twist & msg) { target_twist_ = msg; });
   current_twist_sub_ = create_subscription<geometry_msgs::msg::Twist>(
     "current_twist", 1, [this](const geometry_msgs::msg::Twist & msg) { current_twist_ = msg; });
+  using namespace std::chrono_literals;
+  timer_ = create_wall_timer(10ms, [this]() {
+    if (!target_twist_sub_ || !current_twist_sub_) {
+      return;
+    }
+  });
 }
 }  // namespace usv_controller
 
