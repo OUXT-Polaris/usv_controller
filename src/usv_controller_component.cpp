@@ -35,6 +35,13 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
   get_parameter("anguler_pid_gain.i_max", anguler_pid_gain_.i_max_);
   get_parameter("anguler_pid_gain.antiwindup", anguler_pid_gain_.antiwindup_);
   get_parameter("hull_width", hull_width_);
+
+  linear_pid_ = std::make_shared<control_toolbox::Pid>();
+  linear_pid_->setGains(linear_pid_gain_);
+
+  anguler_pid_ = std::make_shared<control_toolbox::Pid>();
+  anguler_pid_->setGains(linear_pid_gain_);
+
   target_twist_sub_ = create_subscription<geometry_msgs::msg::Twist>(
     "target_twist", 1, [this](const geometry_msgs::msg::Twist & msg) { target_twist_ = msg; });
   current_twist_sub_ = create_subscription<geometry_msgs::msg::Twist>(
@@ -44,6 +51,30 @@ UsvControllerComponent::UsvControllerComponent(const rclcpp::NodeOptions & optio
     if (!target_twist_sub_ || !current_twist_sub_) {
       return;
     }
+    double target_twist_x = target_twist_.value().linear.x;
+    double target_twist_omega = target_twist_.value().angular.z;
+    double current_twist_x = current_twist_.value().linear.x;
+    double current_twist_omega = current_twist_.value().angular.z;
+    const uint64_t dt_ns = 10UL * 1000 * 1000;  // 10ms
+
+    // Calculate force
+    double linear_force = linear_pid_->computeCommand(target_twist_x - current_twist_x, dt_ns);
+    double turning_force =
+      anguler_pid_->computeCommand(target_twist_omega - current_twist_omega, dt_ns);
+
+    left_motor_pub_ =
+      create_publisher<hardware_communication_msgs::msg::MotorControl>("left_motor/cmd", 1);
+    right_motor_pub_ =
+      create_publisher<hardware_communication_msgs::msg::MotorControl>("right_motor/cmd", 1);
+
+    left_motor_pub_->publish(
+      hardware_communication_msgs::build<hardware_communication_msgs::msg::MotorControl>()
+        .motor_enable(true)
+        .motor_speed(linear_force + 0.5 * hull_width_ * turning_force));
+    right_motor_pub_->publish(
+      hardware_communication_msgs::build<hardware_communication_msgs::msg::MotorControl>()
+        .motor_enable(true)
+        .motor_speed(linear_force - 0.5 * hull_width_ * turning_force));
   });
 }
 }  // namespace usv_controller

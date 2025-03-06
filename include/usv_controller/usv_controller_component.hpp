@@ -15,12 +15,12 @@
 #ifndef USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 #define USV_CONTROLLER__USV_CONTROLLER_COMPONENT_HPP_
 
+#include <control_toolbox/pid.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <hardware_communication_msgs/msg/motor_control.hpp>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <usv_controller/visibility_control.hpp>
-#include <control_toolbox/pid.hpp>
 
 namespace usv_controller
 {
@@ -35,6 +35,10 @@ private:
   std::optional<geometry_msgs::msg::Twist> target_twist_;
   std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> current_twist_sub_;
   std::optional<geometry_msgs::msg::Twist> current_twist_;
+  std::shared_ptr<rclcpp::Publisher<hardware_communication_msgs::msg::MotorControl>>
+    left_motor_pub_;
+  std::shared_ptr<rclcpp::Publisher<hardware_communication_msgs::msg::MotorControl>>
+    right_motor_pub_;
   using PidSharedPtr = std::shared_ptr<control_toolbox::Pid>;
   rclcpp::TimerBase::SharedPtr timer_;
   control_toolbox::Pid::Gains linear_pid_gain_;
