@@ -28,21 +28,11 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(usv_controller SHARED
-  src/usv_velocity_controller.cpp
-  src/usv_joy_controller.cpp
+ament_auto_add_library(usv_controller_component SHARED
+  src/usv_controller_component.cpp
 )
 
-# ament_auto_add_library(usv_controller_component SHARED
-#   src/usv_controller_component.cpp
-# )
-
-# Causes the visibility macros to use dllexport rather than dllimport,
-# which is appropriate when building the dll but not consuming it.
-target_compile_definitions(usv_controller PRIVATE "USV_CONTROLLER_BUILDING_DLL")
-# prevent pluginlib from using boost
-target_compile_definitions(usv_controller PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
-pluginlib_export_plugin_description_file(controller_interface usv_controller.xml)
+rclcpp_components_register_nodes(usv_controller_component "usv_controller_component::UsvControllerComponent")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
